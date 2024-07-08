@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\WeaponType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -14,23 +15,23 @@ class WeaponTypeSeeder extends Seeder
     public function run(): void
     {
         //Sword
-        DB::table('weapon_types')->insert([
+        WeaponType::insert([
             'name' => 'sword',
         ]);
         //Gauntlets
-        DB::table('weapon_types')->insert([
+        WeaponType::insert([
             'name' => 'gauntlet',
         ]);
         //Broadblade
-        DB::table('weapon_types')->insert([
+        WeaponType::insert([
             'name' => 'broadblade',
         ]);
         //Pistols
-        DB::table('weapon_types')->insert([
+        WeaponType::insert([
             'name' => 'pistols',
         ]);
         //Rectifier
-        DB::table('weapon_types')->insert([
+        WeaponType::insert([
             'name' => 'rectifier',
         ]);
     }

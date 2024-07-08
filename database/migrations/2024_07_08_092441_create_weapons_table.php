@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('weapons', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->unsignedInteger('type');
-            $table->unsignedInteger('rarity');
+            $table->unsignedBigInteger('type');
+            $table->unsignedBigInteger('rarity');
             $table->timestamps();
 
-            // $table->foreign('type')->references('id')->on('weapon_types');
+            $table->foreign('type')->references('id')->on('weapon_types');
+            $table->foreign('rarity')->references('id')->on('rarities');
         });
     }
 

@@ -15,27 +15,27 @@ class AttributeSeeder extends Seeder
     public function run(): void
     {
         //Spectro Element
-        DB::table('attributes')->insert([
+        Attribute::insert([
             'name' => 'spectro',
         ]);
         //Aero Element
-        DB::table('attributes')->insert([
+        Attribute::insert([
             'name' => 'aero',
         ]);
         //Glacio Element
-        DB::table('attributes')->insert([
+        Attribute::insert([
             'name' => 'glacio',
         ]);
         //Havoc Element
-        DB::table('attributes')->insert([
+        Attribute::insert([
             'name' => 'havoc',
         ]);
         //Fusion Element
-        DB::table('attributes')->insert([
+        Attribute::insert([
             'name' => 'fusion',
         ]);
         //Electro Element
-        DB::table('attributes')->insert([
+        Attribute::insert([
             'name' => 'electro',
         ]);
     }
