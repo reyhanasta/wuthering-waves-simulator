@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('weapon_types', function (Blueprint $table) {
+        Schema::create('rarities', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->enum('level',[5,4,3]);
+            $table->enum('type',['standard','limited']);
             $table->timestamps();
         });
     }
@@ -23,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('weapon_types');
+        Schema::dropIfExists('rarities');
     }
 };

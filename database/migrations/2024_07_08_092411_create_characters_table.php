@@ -14,15 +14,15 @@ return new class extends Migration
         Schema::create('characters', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->unsignedInteger('attribute');
-            $table->unsignedInteger('weapon');
-            $table->enum('rarity',[5,4,3]);
-            $table->enum('type',['limited','standard']);
+            $table->unsignedBigInteger('attribute');
+            $table->unsignedBigInteger('weapon');
+            $table->unsignedBigInteger('rarity');
             $table->timestamps();
 
 
-            // $table->foreign('attribute')->references('id')->on('attributes');
-            // $table->foreign('weapon')->references('id')->on('weapon_types');
+            $table->foreign('attribute')->references('id')->on('attributes');
+            $table->foreign('weapon')->references('id')->on('weapon_types');
+            $table->foreign('rarity')->references('id')->on('rarities');
         });
     }
 

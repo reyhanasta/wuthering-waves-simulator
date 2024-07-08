@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->unsignedInteger('type');
+            $table->unsignedInteger('rarity');
             $table->timestamps();
 
             // $table->foreign('type')->references('id')->on('weapon_types');
