@@ -19,39 +19,49 @@ class GachaController extends Controller
         $sessionId = Session::getId();
         $gachaResult = $this->getGachaResult();
 
-        Cache::put('gacha_result_' . $sessionId, $gachaResult, 60);
+        if ($gachaResult) {
+            // Simpan hasil gacha di cache selama 60 menit
+            Cache::put('gacha_result_' . $sessionId, $gachaResult, 60);
 
-        return response()->json([$gachaResult]);
+            // Kembalikan hasil gacha sebagai respons JSON
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $gachaResult->id,
+                    'name' => $gachaResult->name,
+                    'type' => $gachaResult->type,
+                    'rarity' => $gachaResult->rarity
+                ]
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gacha failed. Please try again.'
+            ]);
+        }
     }
 
     private function getGachaResult()
     {
         // Tentukan rarity level dan probabilitasnya
         $rarityProbabilities = [
-            '5' => 1.5,
+            '1' => 1.5,
             '4' => 9.5,
-            '1' => 89,
+            '5' => 89,
         ];
 
-        // Hitung total bobot probabilitas (total dari semua probabilitas rarity)
-        $totalWeight = array_sum($rarityProbabilities);
-
-        // Generate random float between 0 to 100 (representing percentage)
-        $rand = mt_rand(1, 100);
+        // Generate random float between 0 and 100
+        $rand = mt_rand(0, 10000) / 100;
 
         // Tentukan rarity berdasarkan probabilitas
         $cumulativeProbability = 0;
-        dd($weapon);
         foreach ($rarityProbabilities as $rarity => $probability) {
-            $cumulativeProbability += $probability / $totalWeight; // normalisasi probabilitas
+            $cumulativeProbability += $probability;
             if ($rand <= $cumulativeProbability) {
                 // Ambil satu item dengan rarity ini dari database secara acak
-                $weapon = Weapon::where('rarity', $rarity)->inRandomOrder()->first();
-
-                return $weapon;
+                return Weapon::where('rarity', $rarity)->inRandomOrder()->first();
             }
         }
-
         // Fallback jika terjadi kesalahan
         return null;
     }
