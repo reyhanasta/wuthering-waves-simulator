@@ -8,7 +8,7 @@ Route::get('/', function () {
 });
 Route::get('/convene', [GachaController::class, 'showGachaPage'])->name('gacha.page');
 Route::post('/perform-gacha', [GachaController::class, 'performGacha'])->name('gacha.perform');
-Route::get('/test-gacha', [GachaController::class, 'multiplePulls']);
+Route::get('/test-pity', [GachaController::class, 'pittyBuildUp']);
 
 
 
