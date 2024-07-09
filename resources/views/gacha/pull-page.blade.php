@@ -87,8 +87,16 @@
                                 <form id="gachaForm" method="POST">
                                     @csrf
                                     <button type="submit"
-                                        class="text-xl font-semibold text-black dark:text-white rounded">Perform
-                                        Gacha</button>
+                                        class="text-xl font-semibold text-black dark:text-white rounded flex px-4 py-2 bg-gray-100 text-gray-900 cursor-pointer hover:bg-blue-200 focus:text-blue-700 focus:bg-blue-200 focus:outline-none focus:ring-blue-600">Single Pull</button>
+                                </form>
+                            </div>
+                            <br>
+                            <div class="pt-3 sm:pt-5">
+                                <form id="gachaMultipleForm" method="POST">
+                                    @csrf
+                                    <button type="submit"
+                                        class="text-xl font-semibold text-black dark:text-white rounded flex px-4 py-2 bg-gray-100 text-gray-900 cursor-pointer hover:bg-blue-200 focus:text-blue-700 focus:bg-blue-200 focus:outline-none focus:ring-blue-600">10x
+                                        Pulls</button>
                                 </form>
                             </div>
                         </div>
