@@ -60,9 +60,9 @@
                                 <h2 class="text-xl font-semibold text-black dark:text-white">Pull Status</h2>
                                 <div id="pullStatus">
                                     <ul class="list-disc ml-4">
-                                        <li>Total Pull: {{ Cache::get('totalPulls_count') }}x</li>
-                                        <li>Summons since last 4★ : {{ Cache::get('pitty4_count') }} </li>
-                                        <li>Summons since last 5★ : {{ Cache::get('pitty5_count') }} </li>
+                                        <li>Total Summons: {{ Cache::get('totalPulls_count',0) }}</li>
+                                        <li>Summons since last 4★ or higher : {{ Cache::get('pitty4_count',0) }} </li>
+                                        <li>Summons since last 5★ : {{ Cache::get('pitty5_count',0) }} </li>
                                     </ul>
                                 </div>
                             </div>
@@ -90,7 +90,7 @@
                             </div>
                             <br>
                             <div class="pt-3 sm:pt-5">
-                                <form id="gachaMultipleForm" method="POST">
+                                <form id="gacha-ten-pull" method="POST">
                                     @csrf
                                     <button type="submit"
                                         class="text-xl font-semibold text-black dark:text-white rounded flex px-4 py-2 bg-gray-100 text-gray-900 cursor-pointer hover:bg-blue-200 focus:text-blue-700 focus:bg-blue-200 focus:outline-none focus:ring-blue-600">10x
@@ -98,7 +98,7 @@
                                 </form>
                             </div>
                             <div class="pt-3 sm:pt-5">
-                                <a href="{{route('gacha.reset')}}">Reset</a>
+                                <a href="{{route('gacha.reset')}}" class="text-xl font-semibold text-black dark:text-white rounded flex px-4 py-2 text-gray-900 cursor-pointer hover:bg-blue-200 focus:text-blue-700 focus:bg-blue-200 focus:outline-none focus:ring-blue-600">Reset</a>
                             </div>
                         </div>
                     </div>
