@@ -6,6 +6,8 @@
         axios.post('/perform-gacha')
             .then(function(response) {
                 const resultDiv = document.getElementById('gachaResult');
+                const pullStatus = document.getElementById('pullStatus');
+
                 resultDiv.innerHTML = '';
 
                 if (response.data.success) {
@@ -20,6 +22,13 @@
                                 <li>Rarity: ${weapon.rarity}</li>
                             </ul>
                         </div>
+                    `;
+                    pullStatus.innerHTML = `
+                            <ul class="list-disc ml-4">
+                                <li>Total Summons: ${weapon.totalPulls}x</li>
+                                <li>Summons since last 4★ or higher : ${weapon.pitty4} </li>
+                                <li>Summons since last 5★ : ${weapon.pitty5} </li>
+                            </ul>
                     `;
                 } else {
                     resultDiv.innerHTML = `

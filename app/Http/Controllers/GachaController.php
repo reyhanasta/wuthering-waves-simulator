@@ -9,6 +9,14 @@ use Illuminate\Support\Facades\Session;
 
 class GachaController extends Controller
 {
+    private $rarityProbabilities = [
+        '1' => 1.5,
+        '4' => 9.5,
+        '5' => 89,
+    ];
+
+    private $cacheDuration = 60; // Cache duration in minutes
+
     public function showGachaPage()
     {
         return view('gacha.pull-page');
@@ -18,19 +26,23 @@ class GachaController extends Controller
     {
         $sessionId = Session::getId();
         $gachaResult = $this->getGachaResult();
+        $totalPulls = Cache::get('totalPulls_count', 0);
+        $pitty4 = Cache::get('pitty4_count', 0);
+        $pitty5 = Cache::get('pitty5_count', 0);
 
         if ($gachaResult) {
-            // Simpan hasil gacha di cache selama 60 menit
-            Cache::put('gacha_result_' . $sessionId, $gachaResult, 60);
+            Cache::put('gacha_result_' . $sessionId, $gachaResult, $this->cacheDuration);
 
-            // Kembalikan hasil gacha sebagai respons JSON
             return response()->json([
                 'success' => true,
                 'data' => [
                     'id' => $gachaResult->id,
                     'name' => $gachaResult->name,
                     'type' => $gachaResult->type,
-                    'rarity' => $gachaResult->rarity
+                    'rarity' => $gachaResult->rarity,
+                    'totalPulls' => $totalPulls,
+                    'pitty4' => $pitty4,
+                    'pitty5' => $pitty5,
                 ]
             ]);
         } else {
@@ -43,67 +55,50 @@ class GachaController extends Controller
 
     private function getGachaResult()
     {
-        // Tentukan rarity level dan probabilitasnya
-        $rarityProbabilities = [
-            '1' => 1,
-            '4' => 15,
-            '5' => 84,
-        ];
-
-        // Generate random float between 0 and 100
         $rand = mt_rand(0, 10000) / 100;
-        
-        // Ambil pull count dari cache (jika ada)
-        $pullCount = Cache::get('gacha_pull_count', 0);
-        $fourstarPitty = Cache::get('pitty_1', 0);
-         // Tambah 1 ke pull count
-         $pullCount++;
-         $fourstarPitty++;
-         Cache::put('gacha_pull_count', $pullCount, 60);
-         Cache::put('pitty_1', $fourstarPitty, 60);
-        
-         // Periksa pity counter
-         if ($fourstarPitty % 10 === 0) {
-            // Reset Pitty 4 star dan berikan item 4 star
-            Cache::forget('pitty_1');
-            $weapon =  Weapon::where('rarity', 4)->inRandomOrder()->first();
-            return $weapon;
+        $totalPulls = Cache::get('totalPulls_count', 0) + 1;
+        $fourstarPitty = Cache::get('pitty4_count', 0) + 1;
+        $fivestarPitty = Cache::get('pitty5_count', 0) + 1;
 
-        }elseif($pullCount % 80 === 0){
-            // Reset Pitty 4 star dan berikan item 4 star
-            Cache::forget('gacha_pull_count');
-            $weapon =  Weapon::where('rarity', 1)->inRandomOrder()->first();
-            return $weapon;
+        Cache::put('totalPulls_count', $totalPulls, $this->cacheDuration);
+        Cache::put('pitty4_count', $fourstarPitty, $this->cacheDuration);
+        Cache::put('pitty5_count', $fivestarPitty, $this->cacheDuration);
 
+        if ($fourstarPitty >= 10) {
+            Cache::forget('pitty4_count');
+            return $this->getRandomWeaponByRarity(4);
         }
 
-        // Tentukan rarity berdasarkan probabilitas
+        if ($fivestarPitty >= 80) {
+            Cache::forget('pitty5_count');
+            return $this->getRandomWeaponByRarity(1);
+        }
+
         $cumulativeProbability = 0;
-        foreach ($rarityProbabilities as $rarity => $probability) {
+        foreach ($this->rarityProbabilities as $rarity => $probability) {
             $cumulativeProbability += $probability;
             if ($rand <= $cumulativeProbability) {
-                //Reset Pitty Jika Hit 4 Star
-                if($rarity == 1){
-                    Cache::forget('gacha_pull_count');
-                    Cache::forget('pitty_1');
-                }elseif($rarity == 4){
-                    Cache::forget('pitty_1');
+                if ($rarity == 1) {
+                    Cache::forget('pitty5_count');
+                    Cache::forget('pitty4_count');
+                } elseif ($rarity == 4) {
+                    Cache::forget('pitty4_count');
                 }
-                // Ambil satu item dengan rarity ini dari database secara acak
-                $weapon =  Weapon::where('rarity', $rarity)->inRandomOrder()->first();
-                return $weapon;  
+                return $this->getRandomWeaponByRarity($rarity);
             }
         }
-        // Fallback jika terjadi kesalahan
+
         return null;
     }
 
-    public function pittyBuildUp(){
-        $pitty_4 = 0;
+    private function getRandomWeaponByRarity($rarity)
+    {
+        return Weapon::where('rarity', $rarity)->inRandomOrder()->first();
+    }
 
-        $gachaResult = $this->getGachaResult()->rarity;
-        if($gachaResult != 5) {
-
-        }
+    public function resetGacha()
+    {
+        Cache::flush();
+        return redirect()->route('gacha.page');
     }
 }
