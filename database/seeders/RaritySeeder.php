@@ -13,26 +13,18 @@ class RaritySeeder extends Seeder
      */
     public function run(): void
     {
-        //Sword
+       
        Rarity::insert([
             'level' => '5',
-            'type' => 'limited',
-        ]);
-       Rarity::insert([
-            'level' => '5',
-            'type' => 'standard',
+           
         ]);
        Rarity::insert([
             'level' => '4',
-            'type' => 'limited',
+          
         ]);
-       Rarity::insert([
-            'level' => '4',
-            'type' => 'standard',
-        ]);
+      
        Rarity::insert([
             'level' => '3',
-            'type' => 'standard',
         ]);
     }
 }

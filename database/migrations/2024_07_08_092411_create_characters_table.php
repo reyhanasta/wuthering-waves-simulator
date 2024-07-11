@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('attribute');
             $table->unsignedBigInteger('weapon');
             $table->unsignedBigInteger('rarity');
+            $table->enum('specifications',['limited','standard']);
             $table->timestamps();
 
 

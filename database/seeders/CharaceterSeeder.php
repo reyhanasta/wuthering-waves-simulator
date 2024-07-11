@@ -19,7 +19,8 @@ class CharaceterSeeder extends Seeder
             'name' => 'yangyang',
             'attribute' => 2,
             'weapon' => 1,
-            'rarity' => 4,
+            'rarity' => 2,
+            'specifications' => 'standard',
         ]);
 
         //Jianxin 5 Star Standard
@@ -28,6 +29,7 @@ class CharaceterSeeder extends Seeder
             'attribute' => 2,
             'weapon' => 2,
             'rarity' => 2,
+            'specifications' => 'standard',
         ]);
 
         //Changli 5 Star Limited 
@@ -36,6 +38,7 @@ class CharaceterSeeder extends Seeder
             'attribute' => 5,
             'weapon' => 1,
             'rarity' => 1,
+            'specifications' => 'standard',
         ]);
     }
 }

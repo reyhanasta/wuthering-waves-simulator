@@ -83,11 +83,11 @@
 
                     // Update pull status
                     const statusHTML = `
-                    <div class="custom-pull-status mt-4">
-                        <p>Total Summons: ${response.data.totalPulls}x</p>
-                        <p>Summons since last 4★ or higher: ${response.data.pitty4}</p>
-                        <p>Summons since last 5★: ${response.data.pitty5}</p>
-                    </div>
+                    <ul class="list-disc ml-4">
+                        <li>Total Summons: ${response.data.totalPulls}x</li>
+                        <li>Summons since last 4★ or higher: ${response.data.pitty4}</li>
+                        <li>Summons since last 5★: ${response.data.pitty5}</li>
+                    </ul>
                 `;
                     pullStatus.innerHTML = statusHTML;
                 } else {
