@@ -39,19 +39,21 @@
                     <div class="grid gap-6 lg:grid-cols-1 lg:gap-12">
                         <div href="https://laravel.com/docs" id="docs-card"
                             class="flex flex-col items-start gap-6 overflow-hidden rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] md:row-span-3  dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]">
-                            <div id="gachaResult" class="mt-6"></div>
+                            <div id="gachaResult" ></div>
                         </div>
-                        <div class="flex items-start gap-4 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]">
-                            <div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16">
+                        <div
+                            class="flex items-start gap-4 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]">
+                            <div
+                                class="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16">
 
                             </div>
                             <div class="pt-3 sm:pt-5">
                                 <h2 class="text-xl font-semibold text-black dark:text-white">Pull Status</h2>
                                 <div id="pullStatus">
                                     <ul class="list-disc ml-4">
-                                        <li>Total Summons: {{ Cache::get('totalPulls_count',0) }}</li>
-                                        <li>Summons since last 4★ or higher : {{ Cache::get('pitty4_count',0) }} </li>
-                                        <li>Summons since last 5★ : {{ Cache::get('pitty5_count',0) }} </li>
+                                        <li>Total Summons: {{ Cache::get('totalPulls_count', 0) }}</li>
+                                        <li>Summons since last 4★ or higher : {{ Cache::get('pitty4_count', 0) }} </li>
+                                        <li>Summons since last 5★ : {{ Cache::get('pitty5_count', 0) }} </li>
                                     </ul>
                                 </div>
                             </div>
@@ -80,7 +82,8 @@
                                 </form>
                             </div>
                             <div class="pt-3 sm:pt-5">
-                                <a href="{{route('gacha.reset')}}" class="text-xl font-semibold text-black dark:text-white rounded flex px-4 py-2 text-gray-900 cursor-pointer hover:bg-blue-200 focus:text-blue-700 focus:bg-blue-200 focus:outline-none focus:ring-blue-600">Reset</a>
+                                <a href="{{ route('gacha.reset') }}"
+                                    class="text-xl font-semibold text-black dark:text-white rounded flex px-4 py-2 text-gray-900 cursor-pointer hover:bg-blue-200 focus:text-blue-700 focus:bg-blue-200 focus:outline-none focus:ring-blue-600">Reset</a>
                             </div>
                         </div>
                     </div>

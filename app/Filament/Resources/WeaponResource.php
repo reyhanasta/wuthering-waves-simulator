@@ -24,7 +24,7 @@ class WeaponResource extends Resource
 {
     protected static ?string $model = Weapon::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-rocket-launch';
 
     public static function form(Form $form): Form
     {
@@ -32,19 +32,21 @@ class WeaponResource extends Resource
             ->schema([
                 //
                 TextInput::make('name')
-                ->translateLabel()->columnSpan(2),
+                    ->translateLabel()->columnSpan(3),
+                TextInput::make('slug')
+                    ->translateLabel(),
                 Select::make('rarity')
-            ->options(Rarity::all()
-                    ->pluck('level', 'id')
-                    ->toArray()),
+                    ->options(Rarity::all()
+                        ->pluck('level', 'id')
+                        ->toArray()),
                 Select::make('type')
-            ->options(WeaponType::all()
-                    ->pluck('name', 'id')
-                    ->map(function($name) {
-                        return ucwords($name);
-                    })
-                    ->toArray()),
-            ])->columns(2);
+                    ->options(WeaponType::all()
+                        ->pluck('name', 'id')
+                        ->map(function ($name) {
+                            return ucwords($name);
+                        })
+                        ->toArray()),
+            ])->columns(3);
     }
 
     public static function table(Table $table): Table
@@ -59,14 +61,14 @@ class WeaponResource extends Resource
             ->filters([
                 //
                 SelectFilter::make('type')
-                ->options(
-                    WeaponType::all()
-                    ->pluck('name', 'id')
-                    ->map(function($name) {
-                        return ucwords($name);
-                    })
-                    ->toArray()
-                ),
+                    ->options(
+                        WeaponType::all()
+                            ->pluck('name', 'id')
+                            ->map(function ($name) {
+                                return ucwords($name);
+                            })
+                            ->toArray()
+                    ),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

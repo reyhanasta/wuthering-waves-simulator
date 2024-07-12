@@ -15,7 +15,8 @@ class WeaponSeeder extends Seeder
     {
         //3 Star Weapon
         Weapon::insert([
-            'name' => 'iron-sword',
+            'name' => 'Iron Sword',
+            'slug' => 'iron-sword',
             'type' => 1,
             'rarity' => 3,
             'specifications' => 'standard',
@@ -23,18 +24,20 @@ class WeaponSeeder extends Seeder
         ]);
         //4 Star Weapon
         Weapon::insert([
-            'name' => 'marcato',
+            'name' => 'Marcato',
+            'slug' => 'marcato',
             'type' => 2,
             'rarity' => 2,
-                        'specifications' => 'standard',
+            'specifications' => 'standard',
 
         ]);
         //5 Star Weapon
         Weapon::insert([
-            'name' => 'autumn-harvest',
+            'name' => 'Autumn Harvest',
+            'slug' => 'autumn-harvest',
             'type' => 1,
             'rarity' => 1,
-                        'specifications' => 'standard',
+            'specifications' => 'standard',
 
         ]);
     }

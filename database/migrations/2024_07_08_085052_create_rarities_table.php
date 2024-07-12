@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('rarities', function (Blueprint $table) {
             $table->id();
-            $table->enum('level',[5,4,3]);
+            $table->enum('level',['SSR','SR','R']);
             $table->timestamps();
         });
     }

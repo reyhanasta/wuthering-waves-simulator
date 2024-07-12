@@ -16,7 +16,8 @@ class CharaceterSeeder extends Seeder
     {
         //Yangyang 4 Star
         Character::insert([
-            'name' => 'yangyang',
+            'name' => 'Yangyang',
+            'slug' => 'yangyang',
             'attribute' => 2,
             'weapon' => 1,
             'rarity' => 2,
@@ -26,15 +27,17 @@ class CharaceterSeeder extends Seeder
         //Jianxin 5 Star Standard
         Character::insert([
             'name' => 'jianxin',
+            'slug' => 'jianxin',
             'attribute' => 2,
             'weapon' => 2,
             'rarity' => 2,
             'specifications' => 'standard',
         ]);
 
-        //Changli 5 Star Limited 
+        //Changli 5 Star Limited
         Character::insert([
-            'name' => 'yangyang',
+            'name' => 'Rover(Havoc)',
+            'slug' => 'rover-havoc',
             'attribute' => 5,
             'weapon' => 1,
             'rarity' => 1,
