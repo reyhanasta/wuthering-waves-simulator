@@ -29,11 +29,14 @@
 
                     // Update pull status
                     const statusHTML = `
-                <div class="custom-pull-status">
-                    <p>Total Summons: ${weapon.totalPulls}x</p>
-                    <p>Summons since last 4★ or higher: ${weapon.pitty4}</p>
-                    <p>Summons since last 5★: ${weapon.pitty5}</p>
-                </div>
+                <div class="custom-result-card mx-4 my-2">
+                            <h3>${weapon.name}</h3>
+                            <ul>
+                                <li>ID: ${weapon.id}</li>
+                                <li>Type: ${weapon.type}</li>
+                                <li>Rarity: ${weapon.rarity}</li>
+                            </ul>
+                        </div>
             `;
                     pullStatus.innerHTML = statusHTML;
                 } else {

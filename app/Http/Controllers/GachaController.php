@@ -11,8 +11,8 @@ class GachaController extends Controller
 {
     private $rarityProbabilities = [
         '1' => 1.5,
-        '4' => 9.5,
-        '5' => 89,
+        '2' => 9.5,
+        '3' => 89,
     ];
 
     private $cacheDuration = 120; // Cache duration in minutes
@@ -89,7 +89,7 @@ class GachaController extends Controller
     private function getGachaResult($sessionId)
     {
         $rand = mt_rand(0, 10000) / 100;
-        
+
         // Ensure the cache keys are set before incrementing
         if (!Cache::has('totalPulls_count_' . $sessionId)) {
             Cache::put('totalPulls_count_' . $sessionId, 0, $this->cacheDuration);
@@ -120,7 +120,7 @@ class GachaController extends Controller
 
         $cumulativeProbability = 0;
         foreach ($this->rarityProbabilities as $rarity => $probability) {
-            $cumulativeProbability += ($rarity == 1) ? $probability * $increasedDropRate : $probability;            
+            $cumulativeProbability += ($rarity == 1) ? $probability * $increasedDropRate : $probability;
             if ($rand <= $cumulativeProbability) {
                 if ($rarity == 1) {
                     Cache::forget('pitty5_count_' . $sessionId);
