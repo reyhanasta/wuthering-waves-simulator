@@ -13,7 +13,6 @@
 
                 if (response.data.success) {
                     const weapon = response.data.data;
-
                     // Create and append result card
                     const cardHTML = `
                 <div class="custom-result-card">
@@ -24,20 +23,17 @@
 
                     // Update pull status
                     const statusHTML = `
-                <div class="custom-result-card mx-4 my-2">
-                            <h3>${weapon.name}</h3>
-                            <ul>
-                                <li>ID: ${weapon.id}</li>
-                                <li>Type: ${weapon.type}</li>
-                                <li>Rarity: ${weapon.rarity}</li>
-                            </ul>
-                        </div>
+                    <ul class="list-disc ml-4">
+                        <li>Total Summons: ${weapon.totalPulls}x</li>
+                        <li>Summons since last 4★ or higher: ${weapon.pitty4}</li>
+                        <li>Summons since last 5★: ${weapon.pitty5}</li>
+                    </ul>
             `;
                     pullStatus.innerHTML = statusHTML;
                 } else {
                     resultDiv.innerHTML = `
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                    <span class="block sm:inline">${response.data.message}</span>
+                    <span class="block sm:inline">${weapon.message}</span>
                 </div>
             `;
                 }
@@ -61,18 +57,14 @@
 
                 if (response.data.success) {
                     const weapons = response.data.data;
-
+                    // / Log number of items received
+                    console.log('Number of items received: ', weapons.length);
                     // Build HTML for each weapon
                     let resultHTML = '<div class="flex flex-wrap">';
                     weapons.forEach(weapon => {
                         resultHTML += `
-                        <div class="custom-result-card mx-4 my-2">
-                            <h3>${weapon.name}</h3>
-                            <ul>
-                                <li>ID: ${weapon.id}</li>
-                                <li>Type: ${weapon.type}</li>
-                                <li>Rarity: ${weapon.rarity}</li>
-                            </ul>
+                        <div class="custom-result-card mx-4 my-2">            
+                                <img src="${weapon.img}" alt="${weapon.name}" class="weapon-image"/>
                         </div>
                     `;
                     });

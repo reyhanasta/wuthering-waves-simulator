@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Log;
 use App\Models\Weapon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 
 class GachaController extends Controller
 {
@@ -40,6 +42,7 @@ class GachaController extends Controller
                     'name' => $gachaResult->name,
                     'type' => $gachaResult->type,
                     'rarity' => $gachaResult->rarity,
+                    'img' => asset('storage/'.$gachaResult->img),
                     'totalPulls' => $totalPulls,
                     'pitty4' => $pitty4,
                     'pitty5' => $pitty5,
@@ -56,7 +59,6 @@ class GachaController extends Controller
     public function performTenGacha(Request $request)
     {
         $sessionId = Session::getId();
-        $results = [];
         $totalPulls = Cache::get('totalPulls_count_' . $sessionId, 0);
         $pitty4 = Cache::get('pitty4_count_' . $sessionId, 0);
         $pitty5 = Cache::get('pitty5_count_' . $sessionId, 0);
@@ -67,12 +69,13 @@ class GachaController extends Controller
                 $results[] = [
                     'id' => $gachaResult->id,
                     'name' => $gachaResult->name,
+                    'img' => asset('storage/'.$gachaResult->img),
                     'type' => $gachaResult->type,
                     'rarity' => $gachaResult->rarity,
                 ];
             }
         }
-
+         // Log each weapon added
         $totalPulls = Cache::get('totalPulls_count_' . $sessionId, 0);
         $pitty4 = Cache::get('pitty4_count_' . $sessionId, 0);
         $pitty5 = Cache::get('pitty5_count_' . $sessionId, 0);

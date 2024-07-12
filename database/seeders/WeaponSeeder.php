@@ -21,15 +21,15 @@ class WeaponSeeder extends Seeder
                 'slug' => 'iron-sword',
                 'type' => 1,
                 'rarity' => 3,
-                'img' => '/storage/images/weapons/age-of-harvest.png',
+                'img' => '/storage/images/weapons/iron-sword.png',
                 'specifications' => 'standard'
             ],
             [
                 'name' => 'Marcato',
                 'slug' => 'marcato',
                 'type' => 1,
-                'rarity' => 3,
-                'img' => 'url/to/weapon2_image.png',
+                'rarity' => 2,
+                'img' => 'u/storage/images/weapons/marcato.png',
                 'specifications' => 'standard'
             ],
             [
@@ -37,7 +37,7 @@ class WeaponSeeder extends Seeder
                 'slug' => 'age-of-harvest',
                 'type' => 1,
                 'rarity' => 1,
-                'img' => 'url/to/weapon3_image.png',
+                'img' => '/storage/images/weapons/age-of-harvest.png',
                 'specifications' => 'limited'
             ],
             // tambahkan senjata lainnya
