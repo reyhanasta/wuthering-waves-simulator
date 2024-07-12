@@ -17,12 +17,7 @@
                     // Create and append result card
                     const cardHTML = `
                 <div class="custom-result-card">
-                    <h3>${weapon.name}</h3>
-                    <ul>
-                        <li>ID: ${weapon.id}</li>
-                        <li>Type: ${weapon.type}</li>
-                        <li>Rarity: ${weapon.rarity}</li>
-                    </ul>
+                    <img src="${weapon.img}" alt="${weapon.name}" class="weapon-image"/>
                 </div>
             `;
                     resultDiv.innerHTML += cardHTML;

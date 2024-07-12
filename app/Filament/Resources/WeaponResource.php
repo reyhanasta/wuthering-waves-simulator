@@ -19,6 +19,7 @@ use App\Filament\Resources\WeaponResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\WeaponResource\RelationManagers;
 use App\Models\Rarity;
+use Filament\Forms\Components\FileUpload;
 
 class WeaponResource extends Resource
 {
@@ -35,6 +36,7 @@ class WeaponResource extends Resource
                     ->translateLabel()->columnSpan(3),
                 TextInput::make('slug')
                     ->translateLabel(),
+                FileUpload::make('img')->directory('images/weapons')->preserveFilenames(),
                 Select::make('rarity')
                     ->options(Rarity::all()
                         ->pluck('level', 'id')

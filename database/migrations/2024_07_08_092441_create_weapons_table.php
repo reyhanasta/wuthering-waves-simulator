@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug');
+            $table->string('img')->default('/');
             $table->unsignedBigInteger('type');
             $table->unsignedBigInteger('rarity');
             $table->enum('specifications',['limited','standard']);
