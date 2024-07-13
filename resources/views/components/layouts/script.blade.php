@@ -1,4 +1,4 @@
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" async></script>
 <script>
     document.getElementById('gachaForm').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -13,6 +13,7 @@
 
                 if (response.data.success) {
                     const weapon = response.data.data;
+
                     // Create and append result card
                     const cardHTML = `
                 <div class="custom-result-card">
@@ -57,13 +58,12 @@
 
                 if (response.data.success) {
                     const weapons = response.data.data;
-                    // / Log number of items received
-                    console.log('Number of items received: ', weapons.length);
+
                     // Build HTML for each weapon
                     let resultHTML = '<div class="flex flex-wrap">';
                     weapons.forEach(weapon => {
                         resultHTML += `
-                        <div class="custom-result-card mx-4 my-2">            
+                        <div class="custom-result-card mx-4 my-2">
                                 <img src="${weapon.img}" alt="${weapon.name}" class="weapon-image"/>
                         </div>
                     `;

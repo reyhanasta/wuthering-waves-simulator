@@ -59,9 +59,7 @@ class GachaController extends Controller
     public function performTenGacha(Request $request)
     {
         $sessionId = Session::getId();
-        $totalPulls = Cache::get('totalPulls_count_' . $sessionId, 0);
-        $pitty4 = Cache::get('pitty4_count_' . $sessionId, 0);
-        $pitty5 = Cache::get('pitty5_count_' . $sessionId, 0);
+        $results = [];
 
         for ($i = 0; $i < 10; $i++) {
             $gachaResult = $this->getGachaResult($sessionId);
@@ -75,7 +73,7 @@ class GachaController extends Controller
                 ];
             }
         }
-         // Log each weapon added
+
         $totalPulls = Cache::get('totalPulls_count_' . $sessionId, 0);
         $pitty4 = Cache::get('pitty4_count_' . $sessionId, 0);
         $pitty5 = Cache::get('pitty5_count_' . $sessionId, 0);
@@ -111,16 +109,17 @@ class GachaController extends Controller
         // Peningkatan drop rate hanya untuk rarity 1 jika totalPulls_count >= 70
         $increasedDropRate = ($fivestarPitty >= 70) ? $this->rarityProbabilities[1] * 1.8 + (1 / 100) : $this->rarityProbabilities[1];
 
-        if ($fourstarPitty >= 10) {
+        //Pitty menyentuh kelipatan 10's
+        if ($fourstarPitty >= 10 && $fivestarPitty < 80) {
             Cache::forget('pitty4_count_' . $sessionId);
-            return $this->getRandomWeaponByRarity(4);
+            return $this->getRandomWeaponByRarity(2);
         }
-
-        if ($fivestarPitty >= 80) {
+        //Hard pity (80)
+        if ($fivestarPitty == 80) {
             Cache::forget('pitty5_count_' . $sessionId);
             return $this->getRandomWeaponByRarity(1);
         }
-
+        //Melakukan perhitungan gacha
         $cumulativeProbability = 0;
         foreach ($this->rarityProbabilities as $rarity => $probability) {
             $cumulativeProbability += ($rarity == 1) ? $probability * $increasedDropRate : $probability;
@@ -128,7 +127,7 @@ class GachaController extends Controller
                 if ($rarity == 1) {
                     Cache::forget('pitty5_count_' . $sessionId);
                     Cache::forget('pitty4_count_' . $sessionId);
-                } elseif ($rarity == 4) {
+                } elseif ($rarity == 2) {
                     Cache::forget('pitty4_count_' . $sessionId);
                 }
                 return $this->getRandomWeaponByRarity($rarity);

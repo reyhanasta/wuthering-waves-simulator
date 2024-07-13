@@ -3,6 +3,10 @@
         Options -MultiViews -Indexes
     </IfModule>
 
+    <FilesMatch "\.(jpg|jpeg|png|gif|svg)$">
+        Header set Cache-Control "max-age=604800, public"
+    </FilesMatch>
+
     RewriteEngine On
 
     # Handle Authorization Header
