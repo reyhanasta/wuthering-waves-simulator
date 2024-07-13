@@ -1,95 +1,104 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" async></script>
 <script>
-    document.getElementById('gachaForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+    // Mendengarkan event submit pada container gacha
+    document.getElementById('gachaContainer').addEventListener('submit', function(event) {
+        event.preventDefault();
 
-        axios.post('/perform-gacha')
+        // Identifikasi form yang dipilih
+        const formId = event.target.id;
+
+        // Menentukan endpoint berdasarkan form
+        const endpoint = (formId === 'gachaForm') ? '/perform-gacha' : '/perform-ten-gacha';
+
+        // Melakukan request ke endpoint yang sesuai
+        axios.post(endpoint)
             .then(function(response) {
                 const resultDiv = document.getElementById('gachaResult');
                 const pullStatus = document.getElementById('pullStatus');
-
                 resultDiv.innerHTML = '';
                 pullStatus.innerHTML = '';
 
                 if (response.data.success) {
-                    const weapon = response.data.data;
+                    if (formId === 'gachaForm') {
+                        const weapon = response.data.data;
+                        appendWeaponResult(resultDiv, weapon);
+                        updatePullStatus(pullStatus, weapon, formId);
+                    } else if (formId === 'gacha-ten-pull') {
+                        const weapons = response.data.data;
+                        let totalPulls = response.data.totalPulls;
+                        let pitty4 = response.data.pitty4;
+                        let pitty5 = response.data.pitty5;
 
-                    // Create and append result card
-                    const cardHTML = `
-                <div class="custom-result-card">
-                    <img src="${weapon.img}" alt="${weapon.name}" class="weapon-image"/>
-                </div>
-            `;
-                    resultDiv.innerHTML += cardHTML;
+                        weapons.forEach(weapon => {
+                            appendWeaponResult(resultDiv, weapon);
+                        });
 
-                    // Update pull status
-                    const statusHTML = `
-                    <ul class="list-disc ml-4">
-                        <li>Total Summons: ${weapon.totalPulls}x</li>
-                        <li>Summons since last 4★ or higher: ${weapon.pitty4}</li>
-                        <li>Summons since last 5★: ${weapon.pitty5}</li>
-                    </ul>
-            `;
-                    pullStatus.innerHTML = statusHTML;
+                        updatePullStatus(pullStatus, { totalPulls, pitty4, pitty5 }, formId);
+                    }
                 } else {
-                    resultDiv.innerHTML = `
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                    <span class="block sm:inline">${weapon.message}</span>
-                </div>
-            `;
-                }
-            })
-            .catch(function(error) {
-                console.error('An error occurred:', error);
-            });
-
-    });
-
-    document.getElementById('gacha-ten-pull').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        axios.post('/perform-ten-gacha')
-            .then(function(response) {
-                const resultDiv = document.getElementById('gachaResult');
-                const pullStatus = document.getElementById('pullStatus');
-
-                resultDiv.innerHTML = '';
-                pullStatus.innerHTML = '';
-
-                if (response.data.success) {
-                    const weapons = response.data.data;
-
-                    // Build HTML for each weapon
-                    let resultHTML = '<div class="flex flex-wrap">';
-                    weapons.forEach(weapon => {
-                        resultHTML += `
-                        <div class="custom-result-card mx-4 my-2">
-                                <img src="${weapon.img}" alt="${weapon.name}" class="weapon-image"/>
-                        </div>
-                    `;
-                    });
-                    resultHTML += '</div>';
-                    resultDiv.innerHTML = resultHTML;
-
-                    // Update pull status
-                    const statusHTML = `
-                    <ul class="list-disc ml-4">
-                        <li>Total Summons: ${response.data.totalPulls}x</li>
-                        <li>Summons since last 4★ or higher: ${response.data.pitty4}</li>
-                        <li>Summons since last 5★: ${response.data.pitty5}</li>
-                    </ul>
-                `;
-                    pullStatus.innerHTML = statusHTML;
-                } else {
-                    resultDiv.innerHTML = `
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                        <span class="block sm:inline">${response.data.message}</span>
-                    </div>
-                `;
+                    displayErrorMessage(resultDiv, response.data.message);
                 }
             })
             .catch(function(error) {
                 console.error('An error occurred:', error);
             });
     });
+
+    // Fungsi untuk menambahkan hasil gacha ke DOM
+    function appendWeaponResult(resultDiv, weapon) {
+        const cardHTML = `
+            <div class="custom-result-card">
+                <img src="${weapon.img}" alt="${weapon.name}" class="weapon-image" style="background-color: ${getBackgroundColor(weapon.rarity)}"/>
+            </div>
+        `;
+        resultDiv.insertAdjacentHTML('beforeend', cardHTML);
+    }
+
+    // Fungsi untuk memperbarui status pull
+    function updatePullStatus(pullStatus, data, formId) {
+        let statusHTML;
+
+        if (formId === 'gachaForm') {
+            statusHTML = `
+                <ul class="list-disc ml-4">
+                    <li>Total Summons: ${data.totalPulls}x</li>
+                    <li>Summons since last 4★ or higher: ${data.pitty4}</li>
+                    <li>Summons since last 5★: ${data.pitty5}</li>
+                </ul>
+            `;
+        } else if (formId === 'gacha-ten-pull') {
+            statusHTML = `
+                <ul class="list-disc ml-4">
+                    <li>Total Summons: ${data.totalPulls}x</li>
+                    <li>Summons since last 4★ or higher: ${data.pitty4}</li>
+                    <li>Summons since last 5★: ${data.pitty5}</li>
+                </ul>
+            `;
+        }
+
+        pullStatus.innerHTML = statusHTML;
+    }
+
+    // Fungsi untuk menentukan warna latar belakang berdasarkan rarity
+    function getBackgroundColor(rarity) {
+        switch (rarity) {
+            case 1:
+                return '#ffe0a9';
+            case 2:
+                return '#df96e6';
+            case 3:
+                return 'cyan';
+            default:
+                return 'white';
+        }
+    }
+
+    // Fungsi untuk menampilkan pesan kesalahan
+    function displayErrorMessage(resultDiv, message) {
+        resultDiv.innerHTML = `
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline">${message}</span>
+            </div>
+        `;
+    }
 </script>
