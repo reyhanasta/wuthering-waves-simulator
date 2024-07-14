@@ -55,5 +55,10 @@
         font-size: 0.9rem;
         color: #4a5568;
     }
+
+    #gachaResult {
+        max-width: 40rem; /* Atur lebar maksimum sesuai kebutuhan */
+        margin: 0 auto; /* Agar berada di tengah */
+    }
 </style>
 </head>

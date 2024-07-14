@@ -11,79 +11,51 @@
                             xmlns="http://www.w3.org/2000/svg">
                         </svg>
                     </div>
-                    @if (Route::has('login'))
-                        <nav class="-mx-3 flex flex-1 justify-end">
-                            @auth
-                                <a href="{{ url('/dashboard') }}"
-                                    class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white">
-                                    Dashboard
-                                </a>
-                            @else
-                                <a href="{{ route('login') }}"
-                                    class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white">
-                                    Log in
-                                </a>
-
-                                @if (Route::has('register'))
-                                    <a href="{{ route('register') }}"
-                                        class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white">
-                                        Register
-                                    </a>
-                                @endif
-                            @endauth
-                        </nav>
-                    @endif
+                  
                 </header>
 
-                <main class="mt-4">
+                <main class="mt-1">
                     <div class="grid gap-6 lg:grid-cols-1 lg:gap-12">
-                        <div id="gachaContainer" class="flex flex-col gap-6 lg:grid-cols-3">
-                            <div id="docs-card"
-                                class="flex flex-col items-start gap-12 overflow-hidden rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] md:row-span-3  dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]">
-                                <div id="gachaResult"></div>
+                        <div id="gachaContainer" class="flex flex-col gap- lg:grid-cols-3">
+                            <div id="docs-card" class="flex flex-col items-start gap-12 overflow-hidden rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] md:row-span-3 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]">
+                                <div id="gachaResult" class="grid grid-cols-5 gap-2">
+                                    <!-- Kartu-kartu hasil gacha akan ditambahkan di sini menggunakan JavaScript -->
+                                </div>
                             </div>
-                            <div
-                                class="flex items-start gap-4 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]">
-                                <div class="pt-3 sm:pt-5">
-                                    <h2 class="text-xl font-semibold text-black dark:text-white">Pull Status</h2>
-                                    <div id="pullStatus">
-                                        <ul class="list-disc ml-4">
-                                            <li>Total Summons: {{ Cache::get('totalPulls_count', 0) }}</li>
-                                            <li>Summons since last 4★ or higher : {{ Cache::get('pitty4_count', 0) }}
-                                            </li>
-                                            <li>Summons since last 5★ : {{ Cache::get('pitty5_count', 0) }} </li>
-                                        </ul>
+                            
+                            <div class="flex flex-col items-start gap-4 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]">
+                                <div class="w-full flex items-center justify-between mb-4">
+                                    <div class="pt-3 sm:pt-5">
+                                        <h2 class="text-xl font-semibold text-black dark:text-white">Pull Status</h2>
+                                        <div id="pullStatus">
+                                            <ul class="list-disc ml-4">
+                                                <li>Total Summons: {{ Cache::get('totalPulls_count', 0) }}</li>
+                                                <li>Summons since last 4★ or higher: {{ Cache::get('pitty4_count', 0) }}</li>
+                                                <li>Summons since last 5★: {{ Cache::get('pitty5_count', 0) }}</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <form id="gachaForm" method="POST">
+                                            @csrf
+                                            <button type="submit" class="text-xl font-semibold text-black dark:text-white rounded px-4 py-2 bg-gray-100 text-gray-900 cursor-pointer hover:bg-blue-200 focus:text-blue-700 focus:bg-blue-200 focus:outline-none focus:ring-blue-600">
+                                                Single Pull
+                                            </button>
+                                        </form>
+                                        <form id="gacha-ten-pull" method="POST">
+                                            @csrf
+                                            <button type="submit" class="text-xl font-semibold text-black dark:text-white rounded px-4 py-2 bg-gray-100 text-gray-900 cursor-pointer hover:bg-blue-200 focus:text-blue-700 focus:bg-blue-200 focus:outline-none focus:ring-blue-600">
+                                                10x Pulls
+                                            </button>
+                                        </form>
+                                        <a href="{{ route('gacha.reset') }}" class="text-xl font-semibold text-black dark:text-white rounded px-4 py-2  text-gray-900 cursor-pointer hover:bg-blue-200 focus:text-blue-700 focus:bg-blue-200 focus:outline-none focus:ring-blue-600">
+                                            Reset
+                                        </a>
                                     </div>
                                 </div>
+                               
                             </div>
-                            <div
-                                class="flex items-start gap-4 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]">
-                                <div class="pt-3 sm:pt-5">
-                                    <form id="gachaForm" method="POST">
-                                        @csrf
-                                        <button type="submit"
-                                            class="text-xl font-semibold text-black dark:text-white rounded flex px-4 py-2 bg-gray-100 text-gray-900 cursor-pointer hover:bg-blue-200 focus:text-blue-700 focus:bg-blue-200 focus:outline-none focus:ring-blue-600">
-                                            Single Pull
-                                        </button>
-                                    </form>
-                                </div>
-                                <br>
-                                <div class="pt-3 sm:pt-5">
-                                    <form id="gacha-ten-pull" method="POST">
-                                        @csrf
-                                        <button type="submit"
-                                            class="text-xl font-semibold text-black dark:text-white rounded flex px-4 py-2 bg-gray-100 text-gray-900 cursor-pointer hover:bg-blue-200 focus:text-blue-700 focus:bg-blue-200 focus:outline-none focus:ring-blue-600">
-                                            10x Pulls
-                                        </button>
-                                    </form>
-                                </div>
-                                <div class="pt-3 sm:pt-5">
-                                    <a href="{{ route('gacha.reset') }}"
-                                        class="text-xl font-semibold text-black dark:text-white rounded flex px-4 py-2 text-gray-900 cursor-pointer hover:bg-blue-200 focus:text-blue-700 focus:bg-blue-200 focus:outline-none focus:ring-blue-600">
-                                        Reset
-                                    </a>
-                                </div>
-                            </div>
+                            
                         </div>
                     </div>
                 </main>

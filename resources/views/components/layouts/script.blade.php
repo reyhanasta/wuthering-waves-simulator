@@ -32,8 +32,12 @@
                         weapons.forEach(weapon => {
                             appendWeaponResult(resultDiv, weapon);
                         });
-
-                        updatePullStatus(pullStatus, { totalPulls, pitty4, pitty5 }, formId);
+                        
+                        updatePullStatus(pullStatus, {
+                            totalPulls,
+                            pitty4,
+                            pitty5
+                        }, formId);
                     }
                 } else {
                     displayErrorMessage(resultDiv, response.data.message);
@@ -46,11 +50,25 @@
 
     // Fungsi untuk menambahkan hasil gacha ke DOM
     function appendWeaponResult(resultDiv, weapon) {
-        const cardHTML = `
-            <div class="custom-result-card">
-                <img src="${weapon.img}" alt="${weapon.name}" class="weapon-image" style="background-color: ${getBackgroundColor(weapon.rarity)}"/>
+        
+       const cardHTML = `
+    <div class="relative card bg-gray-800 rounded-lg overflow-hidden shadow-lg p-2">
+        <div class="absolute top-0 left-0 bg-yellow-500 text-white text-xs font-bold p-1">New</div>
+        <img class="w-full h-32 object-cover" src="${weapon.img}" alt="${weapon.name}" style="background-color: ${getBackgroundColor(weapon.rarity)}"/>
+        <div class="p-1">
+            <div class="flex justify-center">
+                <span class="text-yellow-400">
+                    ${
+                        weapon.rarity === 1 ? '★★★★★' :
+                        weapon.rarity === 2 ? '★★★★' :
+                        weapon.rarity === 3 ? '★★★' :
+                        ''
+                    }
+                </span>
             </div>
-        `;
+        </div>
+    </div>
+`;
         resultDiv.insertAdjacentHTML('beforeend', cardHTML);
     }
 
