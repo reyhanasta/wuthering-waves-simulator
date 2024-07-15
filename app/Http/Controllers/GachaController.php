@@ -43,10 +43,10 @@ class GachaController extends Controller
                     'type' => $gachaResult->type,
                     'rarity' => $gachaResult->rarity,
                     'img' => asset('storage/' . $gachaResult->img),
-                    'totalPulls' => $cacheData['totalPulls'],
-                    'pitty4' => $cacheData['pitty4'],
-                    'pitty5' => $cacheData['pitty5'],
-                ]
+                ],
+                'totalPulls' => $cacheData['totalPulls'],
+                'pitty4' => $cacheData['pitty4'],
+                'pitty5' => $cacheData['pitty5'],
             ]);
         } else {
             return response()->json([
@@ -63,6 +63,7 @@ class GachaController extends Controller
 
         for ($i = 0; $i < 10; $i++) {
             $gachaResult = $this->getGachaResult($sessionId);
+            // $this->updateInventory($sessionId,$gachaResult);
             if ($gachaResult) {
                 $results[] = [
                     'id' => $gachaResult->id,
@@ -123,6 +124,11 @@ class GachaController extends Controller
 
         return $weapons->random();
     }
+
+    // private function updateInventory($sessionId,$items)
+    // {
+    //     return Redis::lpush('inventory_' . $sessionId, $items);
+    // }
 
     private function initializeCache($sessionId)
     {
