@@ -6,8 +6,8 @@ use Log;
 use App\Models\Weapon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Storage;
 
 class GachaController extends Controller
 {
@@ -21,15 +21,17 @@ class GachaController extends Controller
 
     public function showGachaPage()
     {
-        return view('gacha.pull-page');
+        $sessionId = Session::getId();
+        $cachedData = $this->getCacheData($sessionId);
+        return view('gacha.pull-page',compact('cachedData'));
     }
 
     public function performGacha()
     {
         $sessionId = Session::getId();
-                $this->initializeCache($sessionId);
-
+        $this->initializeCache($sessionId);
         $gachaResult = $this->getGachaResult($sessionId);
+        Redis::incr('totalPulls_count_' . $sessionId);
         $cacheData = $this->getCacheData($sessionId);
 
         if ($gachaResult) {
@@ -40,7 +42,7 @@ class GachaController extends Controller
                     'name' => $gachaResult->name,
                     'type' => $gachaResult->type,
                     'rarity' => $gachaResult->rarity,
-                    'img' => asset('storage/'.$gachaResult->img),
+                    'img' => asset('storage/' . $gachaResult->img),
                     'totalPulls' => $cacheData['totalPulls'],
                     'pitty4' => $cacheData['pitty4'],
                     'pitty5' => $cacheData['pitty5'],
@@ -65,13 +67,13 @@ class GachaController extends Controller
                 $results[] = [
                     'id' => $gachaResult->id,
                     'name' => $gachaResult->name,
-                    'img' => asset('storage/'.$gachaResult->img),
+                    'img' => asset('storage/' . $gachaResult->img),
                     'type' => $gachaResult->type,
                     'rarity' => $gachaResult->rarity,
                 ];
             }
         }
-
+        Redis::incrby('totalPulls_count_' . $sessionId, 10);
         $cacheData = $this->getCacheData($sessionId);
 
         return response()->json([
@@ -86,9 +88,8 @@ class GachaController extends Controller
     private function getGachaResult($sessionId)
     {
         $rand = mt_rand(0, 10000) / 100;
-        Cache::increment('totalPulls_count_' . $sessionId);
-        $fourstarPitty = Cache::increment('pitty4_count_' . $sessionId);
-        $fivestarPitty = Cache::increment('pitty5_count_' . $sessionId);
+        $fourstarPitty = Redis::incr('pitty4_count_' . $sessionId);
+        $fivestarPitty = Redis::incr('pitty5_count_' . $sessionId);
 
         $increasedDropRate = ($fivestarPitty >= 70) ? $this->rarityProbabilities[1] * 1.8 + (1 / 100) : $this->rarityProbabilities[1];
 
@@ -116,7 +117,7 @@ class GachaController extends Controller
 
     private function getRandomWeaponByRarity($rarity)
     {
-        $weapons = Cache::remember("weapons_rarity_{$rarity}", $this->cacheDuration, function () use ($rarity) {
+        $weapons = Cache::remember("weapons_rarity_{$rarity}", $this->cacheDuration * 60, function () use ($rarity) {
             return Weapon::where('rarity', $rarity)->get();
         });
 
@@ -125,23 +126,23 @@ class GachaController extends Controller
 
     private function initializeCache($sessionId)
     {
-        if (!Cache::has('totalPulls_count_' . $sessionId)) {
-            Cache::put('totalPulls_count_' . $sessionId, 0, $this->cacheDuration);
+        if (!Redis::exists('totalPulls_count_' . $sessionId)) {
+            Redis::setex('totalPulls_count_' . $sessionId, $this->cacheDuration * 60, 0);
         }
-        if (!Cache::has('pitty4_count_' . $sessionId)) {
-            Cache::put('pitty4_count_' . $sessionId, 0, $this->cacheDuration);
+        if (!Redis::exists('pitty4_count_' . $sessionId)) {
+            Redis::setex('pitty4_count_' . $sessionId, $this->cacheDuration * 60, 0);
         }
-        if (!Cache::has('pitty5_count_' . $sessionId)) {
-            Cache::put('pitty5_count_' . $sessionId, 0, $this->cacheDuration);
+        if (!Redis::exists('pitty5_count_' . $sessionId)) {
+            Redis::setex('pitty5_count_' . $sessionId, $this->cacheDuration * 60, 0);
         }
     }
 
     private function getCacheData($sessionId)
     {
         return [
-            'totalPulls' => Cache::get('totalPulls_count_' . $sessionId, 0),
-            'pitty4' => Cache::get('pitty4_count_' . $sessionId, 0),
-            'pitty5' => Cache::get('pitty5_count_' . $sessionId, 0),
+            'totalPulls' => Redis::get('totalPulls_count_' . $sessionId) ?? 0,
+            'pitty4' => Redis::get('pitty4_count_' . $sessionId) ?? 0,
+            'pitty5' => Redis::get('pitty5_count_' . $sessionId) ?? 0,
         ];
     }
 
@@ -149,7 +150,7 @@ class GachaController extends Controller
     {
         $sessionId = Session::getId();
         foreach (['totalPulls_count_', 'pitty4_count_', 'pitty5_count_'] as $prefix) {
-            Cache::forget($prefix . $sessionId);
+            Redis::del($prefix . $sessionId);
         }
         return redirect()->route('gacha.page');
     }
@@ -158,11 +159,11 @@ class GachaController extends Controller
     {
         switch ($rarity) {
             case 1:
-                Cache::put('pitty5_count_' . $sessionId, 0, $this->cacheDuration);
-                Cache::put('pitty4_count_' . $sessionId, 0, $this->cacheDuration);
+                Redis::setex('pitty5_count_' . $sessionId, $this->cacheDuration * 60, 0);
+                Redis::setex('pitty4_count_' . $sessionId, $this->cacheDuration * 60, 0);
                 break;
             case 2:
-                Cache::put('pitty4_count_' . $sessionId, 0, $this->cacheDuration);
+                Redis::setex('pitty4_count_' . $sessionId, $this->cacheDuration * 60, 0);
                 break;
             default:
                 break;

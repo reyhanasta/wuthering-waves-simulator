@@ -10,6 +10,14 @@
         // Menentukan endpoint berdasarkan form
         const endpoint = (formId === 'gachaForm') ? '/perform-gacha' : '/perform-ten-gacha';
 
+        // Menampilkan loading text
+        const loadingText = document.getElementById('loadingText');
+        loadingText.style.display = 'flex';
+
+        // Sembunyikan gacha results
+        const gachaResult = document.getElementById('gachaResult');
+        gachaResult.style.display = 'none';
+
         // Melakukan request ke endpoint yang sesuai
         axios.post(endpoint)
             .then(function(response) {
@@ -32,7 +40,7 @@
                         weapons.forEach(weapon => {
                             appendWeaponResult(resultDiv, weapon);
                         });
-                        
+
                         updatePullStatus(pullStatus, {
                             totalPulls,
                             pitty4,
@@ -42,22 +50,38 @@
                 } else {
                     displayErrorMessage(resultDiv, response.data.message);
                 }
+                // Sembunyikan loading text setelah respons diterima
+                loadingText.style.display = 'none';
+                // Tampilkan kembali gacha results dan pull status
+                gachaResult.style.display = 'grid';
+                // Ubah jumlah kolom (cols) berdasarkan formId
+
+                gachaResult.classList.remove('grid-cols-1', 'grid-cols-5'); // Hapus kelas sebelumnya
+                if (formId === 'gachaForm') {
+                    gachaResult.classList.add('grid-cols-1'); // Set 1 kolom
+                } else {
+                    gachaResult.classList.add('grid-cols-5'); // Set 5 kolom
+                }
             })
             .catch(function(error) {
                 console.error('An error occurred:', error);
+                // Sembunyikan loading text jika terjadi kesalahan
+                loadingText.style.display = 'none';
+                gachaResult.style.display = 'block';
+                displayErrorMessage(resultDiv, 'Gacha failed. Please try again.');
             });
     });
 
     // Fungsi untuk menambahkan hasil gacha ke DOM
     function appendWeaponResult(resultDiv, weapon) {
-        
-       const cardHTML = `
-    <div class="relative card bg-gray-800 rounded-lg overflow-hidden shadow-lg p-2">
+
+        const cardHTML = `
+    <div class="relative bg-gray-800 rounded-lg overflow-hidden shadow-lg p-2">
         <div class="absolute top-0 left-0 bg-yellow-500 text-white text-xs font-bold p-1">New</div>
         <img class="w-full h-32 object-cover" src="${weapon.img}" alt="${weapon.name}" style="background-color: ${getBackgroundColor(weapon.rarity)}"/>
-        <div class="p-1">
+        <div class="p-2">
             <div class="flex justify-center">
-                <span class="text-yellow-400">
+                <span class="text-yellow-400 text-xs">
                     ${
                         weapon.rarity === 1 ? '★★★★★' :
                         weapon.rarity === 2 ? '★★★★' :
@@ -66,10 +90,17 @@
                     }
                 </span>
             </div>
+            <div class="text-center mt-2">
+                <p class="text-white">${weapon.name}</p>
+            </div>
         </div>
     </div>
 `;
+
+
         resultDiv.insertAdjacentHTML('beforeend', cardHTML);
+
+
     }
 
     // Fungsi untuk memperbarui status pull
