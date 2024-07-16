@@ -22,9 +22,9 @@ class GachaController extends Controller
     public function showGachaPage()
     {
         $sessionId = Session::getId();
+        $bgImg = Storage::url('public/images/background/gacha-banner.jpg');
         $cachedData = $this->getCacheData($sessionId);
-        $path = 'public/images/background/gacha-banner.jpg';
-        $bgImg = Storage::url($path);
+
         return view('gacha.pull-page',compact('cachedData','bgImg'));
     }
     public function performGacha()
@@ -154,7 +154,7 @@ class GachaController extends Controller
             'inventory' => Redis::get('inventory_' . $sessionId) ?? 0,
             'totalPulls' => Redis::get('totalPulls_count_' . $sessionId) ?? 0,
             'pitty4' => Redis::get('pitty4_count_' . $sessionId) ?? 0,
-            'pitty5' => Redis::get('pitty5_count_' . $sessionId) ?? 0,
+            'pitty5' => Redis::get('pitty5_count_' . $sessionId) ?? 0
         ];
     }
 
