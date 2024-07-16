@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 
 class GachaController extends Controller
 {
@@ -18,14 +19,14 @@ class GachaController extends Controller
     ];
 
     private $cacheDuration = 120; // Cache duration in minutes
-
     public function showGachaPage()
     {
         $sessionId = Session::getId();
         $cachedData = $this->getCacheData($sessionId);
-        return view('gacha.pull-page',compact('cachedData'));
+        $path = 'public/images/background/gacha-banner.jpg';
+        $bgImg = Storage::url($path);
+        return view('gacha.pull-page',compact('cachedData','bgImg'));
     }
-
     public function performGacha()
     {
         $sessionId = Session::getId();
@@ -35,6 +36,8 @@ class GachaController extends Controller
         $cacheData = $this->getCacheData($sessionId);
 
         if ($gachaResult) {
+            //masukan kode redis untuk update cache inventory
+            $this->updateInventory($sessionId, $gachaResult);
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -63,7 +66,6 @@ class GachaController extends Controller
 
         for ($i = 0; $i < 10; $i++) {
             $gachaResult = $this->getGachaResult($sessionId);
-            // $this->updateInventory($sessionId,$gachaResult);
             if ($gachaResult) {
                 $results[] = [
                     'id' => $gachaResult->id,
@@ -72,11 +74,11 @@ class GachaController extends Controller
                     'type' => $gachaResult->type,
                     'rarity' => $gachaResult->rarity,
                 ];
+                $this->updateInventory($sessionId, $gachaResult);
             }
         }
         Redis::incrby('totalPulls_count_' . $sessionId, 10);
         $cacheData = $this->getCacheData($sessionId);
-
         return response()->json([
             'success' => true,
             'data' => $results,
@@ -125,10 +127,10 @@ class GachaController extends Controller
         return $weapons->random();
     }
 
-    // private function updateInventory($sessionId,$items)
-    // {
-    //     return Redis::lpush('inventory_' . $sessionId, $items);
-    // }
+    private function updateInventory($sessionId, $item)
+    {
+        Redis::lpush('inventory_' . $sessionId, json_encode($item));
+    }
 
     private function initializeCache($sessionId)
     {
@@ -141,11 +143,15 @@ class GachaController extends Controller
         if (!Redis::exists('pitty5_count_' . $sessionId)) {
             Redis::setex('pitty5_count_' . $sessionId, $this->cacheDuration * 60, 0);
         }
+        if (!Redis::exists('inventory_' . $sessionId)) {
+            Redis::setex('inventory_' . $sessionId, $this->cacheDuration * 60, 0);
+        }
     }
 
     private function getCacheData($sessionId)
     {
         return [
+            'inventory' => Redis::get('inventory_' . $sessionId) ?? 0,
             'totalPulls' => Redis::get('totalPulls_count_' . $sessionId) ?? 0,
             'pitty4' => Redis::get('pitty4_count_' . $sessionId) ?? 0,
             'pitty5' => Redis::get('pitty5_count_' . $sessionId) ?? 0,

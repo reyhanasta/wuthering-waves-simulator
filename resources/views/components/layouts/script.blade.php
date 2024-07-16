@@ -12,16 +12,21 @@
         const loadingText = document.getElementById('loadingText');
         // Sembunyikan gacha results
         const gachaResult = document.getElementById('gachaResult');
+        const weaponList = document.getElementById('weapon-list');
+        const bgImage = document.getElementById('bg-img');
+        const docsCard = document.getElementById('docs-card');
         const pullStatus = document.getElementById('pullStatus');
 
         loadingText.style.display = 'flex';
         gachaResult.style.display = 'none';
-
+        bgImage.style.display = 'none';
+        docsCard.classList.add('p-6'); // Set 1 kolom
         // Melakukan request ke endpoint yang sesuai
         try {
             const response = await axios.post(endpoint);
-            gachaResult.innerHTML = '';
+            gachaResult.innerHTML = '<button id="closeButton" class="absolute top-0 right-0 m-2 text-white bg-gray-800 rounded-full p-2 focus:outline-none"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>';
             pullStatus.innerHTML = '';
+            // docsCard.innerHTML='';
 
             if (response.data.success) {
                 const {
@@ -60,36 +65,40 @@
             } else {
                 gachaResult.classList.add('grid-cols-5'); // Set 5 kolom
             }
+
+            // Add event listener to the close button
+            document.getElementById('closeButton').addEventListener('click', function() {
+                gachaResult.style.display = 'none';
+                bgImage.style.display = 'flex';
+                docsCard.classList.remove('p-6'); // Set 1 kolom
+            });
         }
     });
 
     // Fungsi untuk menambahkan hasil gacha ke DOM
     function appendWeaponResult(gachaResult, weapon) {
-
         const cardHTML = `
-    <div class="relative bg-gray-800 rounded-lg overflow-hidden shadow-lg p-2">$
-        <div class="absolute top-0 left-0 bg-yellow-500 text-white text-xs font-bold p-1">New</div>
-        <img class="w-full h-32 object-cover" src="${weapon.img}" alt="${weapon.name}" style="background-color: ${getBackgroundColor(weapon.rarity)}"/>
-        <div class="p-2">
-            <div class="flex justify-center">
-                <span class="text-yellow-400 text-xs">
-                    ${
-                        weapon.rarity === 1 ? '★★★★★' :
-                        weapon.rarity === 2 ? '★★★★' :
-                        weapon.rarity === 3 ? '★★★' :
-                        ''
-                    }
-                </span>
+            <div id="weapon-list" class="relative bg-gray-800 rounded-xl overflow-hidden shadow-lg p-2">
+                <div class="absolute top-0 left-0 bg-yellow-500 text-white text-xs font-bold p-1">New</div>
+                <img class="w-full h-32 object-cover" src="${weapon.img}" alt="${weapon.name}" style="background-color: ${getBackgroundColor(weapon.rarity)}"/>
+                <div class="p-2">
+                    <div class="flex justify-center">
+                        <span class="text-yellow-400 text-xs">
+                            ${
+                                weapon.rarity === 1 ? '★★★★★' :
+                                weapon.rarity === 2 ? '★★★★' :
+                                weapon.rarity === 3 ? '★★★' :
+                                ''
+                            }
+                        </span>
+                    </div>
+                    <div class="text-center mt-2">
+                        <p class="text-white">${weapon.name}</p>
+                    </div>
+                </div>
             </div>
-            <div class="text-center mt-2">
-                <p class="text-white">${weapon.name}</p>
-            </div>
-        </div>
-    </div>
-`;
+        `;
         gachaResult.insertAdjacentHTML('beforeend', cardHTML);
-
-
     }
 
     // Fungsi untuk memperbarui status pull
