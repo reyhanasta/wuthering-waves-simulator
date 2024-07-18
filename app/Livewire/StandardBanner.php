@@ -17,7 +17,7 @@ class StandardBanner extends Component
         '3' => 93.5,
     ];
     public $cacheDuration = 120; // Cache duration in minutes
-   
+
     public $cachedData;
     public $gachaResults=[];
 
@@ -31,6 +31,8 @@ class StandardBanner extends Component
         $this->cachedData = $this->getCacheData($sessionId);
     }
 
+
+
     public function singlePull()
     {
         $this->sessionId = Session::getId();
@@ -38,7 +40,8 @@ class StandardBanner extends Component
         $gachaResult = $this->getGachaResult($this->sessionId);
         Redis::incr('totalPulls_count_' . $this->sessionId);
         $this->cachedData = $this->getCacheData($this->sessionId);
-        if ($gachaResult) { 
+        if ($gachaResult) {
+            $this->bgImg = '';
             $this->gachaResults = [[
                 'id' => $gachaResult->id,
                 'name' => $gachaResult->name,
@@ -67,8 +70,9 @@ class StandardBanner extends Component
         }
         Redis::incrby('totalPulls_count_' . $this->sessionId, 10);
         $this->cachedData = $this->getCacheData($this->sessionId);
+        $this->bgImg = '';
         $this->gachaResults = $results;
-        
+
     }
 
     private function getGachaResult($sessionId)
@@ -118,9 +122,9 @@ class StandardBanner extends Component
 
     private function getCacheData($sessionId)
     {
-    
+
         return [
-           
+
             'totalPulls' => Redis::get('totalPulls_count_' . $sessionId) ?? 0,
             'pitty4' => Redis::get('pitty4_count_' . $sessionId) ?? 0,
             'pitty5' => Redis::get('pitty5_count_' . $sessionId) ?? 0
