@@ -3,7 +3,7 @@
         <div id="gachaContainer" class="flex flex-col items-center justify-center gap-3 lg:grid-cols-1">
             <div id="bannerArea" class="flex flex-col items-start">
                 <img id="bannerImg" class="max-w-2xl shadow-lg rounded-2xl" src="{{ $bgImg }}" alt="">
-                <div id="gachaResult" class="max-w-2xl m-5 grid grid-cols-5 grid-rows-1 gap-2 justify-center">
+                <div id="gachaResult" class="max-w-2xl m-5 grid grid-cols-5 grid-rows-1 gap-2 justify-center ">
                     @foreach ($gachaResults as $item)
                         <div id="weapon-list" class="relative p-2 overflow-hidden bg-gray-800 shadow-lg rounded-xl">
                             <div class="absolute top-0 left-0 p-1 text-xs font-bold text-white bg-yellow-500">New</div>
@@ -26,10 +26,10 @@
                         </div>
                     @endforeach
                 </div>
-                <div id="statusArea" class="flex w-full rounded-lg shadow-lg p-4 border bg-gray-50 dark:bg-black dark:text-white">
+                <div id="statusArea" class="flex w-full dark:text-white font-semibold">
                     <div class="grid grid-cols-2 w-full">
                         <div id="pullStatus" class="justify-start">
-                            <div class="pullCounter">
+                            <div id="pullCounter">
                                 <ul class="ml-6 list-disc">
                                     <li>Total Summons: {{ $cachedData['totalPulls'] }}</li>
                                     <li>Summons since last 4★ or higher:
@@ -42,7 +42,7 @@
                                 <ul class="grid grid-cols-3">
                                     <li class="grid m-2 place-items-center">
                                         <button type="button"
-                                            class="flex items-center text-sm font-semibold hover:text-blue-500"
+                                            class="flex items-center text-sm  hover:text-blue-500"
                                             rel="noopener noreferrer"> <svg xmlns="http://www.w3.org/2000/svg"
                                                 fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                                 stroke="currentColor" class="size-6">
@@ -53,30 +53,27 @@
                                             </button>
                                     </li>
                                     <li class="grid place-items-center">
-                                        <a href="{{ route('gacha.reset') }}"
-                                            class="flex items-center text-xl font-semibold hover:text-blue-500"
-                                            rel="noopener noreferrer">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                                            </svg>
-                                            <span
-                                                class="text-sm font-semibold text-black cursor-pointer dark:text-white focus:text-blue-700 focus:outline-none ">Reset</span>
-                                        </a>
+                                        <button type="button"
+                                            class="flex items-center text-sm  hover:text-blue-500"
+                                            rel="noopener noreferrer">  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                        </svg>
+                                           Reset
+                                            </button>
                                     </li>
                                     <li class="grid place-items-center">
-                                        <a href="http://" target="_blank"
-                                            class="flex items-center text-xl font-semibold hover:text-blue-500"
-                                            rel="noopener noreferrer">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Zm3.75 11.625a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                                            </svg>
-                                            <span
-                                                class="text-sm font-semibold text-black cursor-pointer dark:text-white focus:text-blue-700 focus:outline-none ">Detals</span>
-                                        </a>
+                                        <button type="button"
+                                        class="flex items-center text-sm  hover:text-blue-500"
+                                        rel="noopener noreferrer">  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Zm3.75 11.625a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                                    </svg>
+                                       Detail
+                                        </button>
+
                                     </li>
 
                                 </ul>
