@@ -15,6 +15,7 @@
         const weaponList = document.getElementById('weapon-list');
         const bgImage = document.getElementById('bg-img');
         const docsCard = document.getElementById('docs-card');
+        const bannerArea = document.getElementById('bannerArea');
         const pullStatus = document.getElementById('pullStatus');
 
         loadingText.style.display = 'flex';
@@ -26,7 +27,7 @@
             const response = await axios.post(endpoint);
             gachaResult.innerHTML = '<button id="closeButton" class="absolute top-0 right-0 m-2 text-white bg-gray-800 rounded-full p-2 focus:outline-none"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>';
             pullStatus.innerHTML = '';
-            // docsCard.innerHTML='';
+
 
             if (response.data.success) {
                 const {
@@ -70,7 +71,7 @@
             document.getElementById('closeButton').addEventListener('click', function() {
                 gachaResult.style.display = 'none';
                 bgImage.style.display = 'flex';
-                docsCard.classList.remove('p-6'); // Set 1 kolom
+                docsCard.classList.add('p-6'); // Set 1 kolom
             });
         }
     });
