@@ -50,6 +50,7 @@ class GachaController extends Controller
                 'totalPulls' => $cacheData['totalPulls'],
                 'pitty4' => $cacheData['pitty4'],
                 'pitty5' => $cacheData['pitty5'],
+                
             ]);
         } else {
             return response()->json([
@@ -129,7 +130,7 @@ class GachaController extends Controller
 
     private function updateInventory($sessionId, $item)
     {
-        Redis::lpush('inventory_' . $sessionId, json_encode($item));
+        Redis::lpush('inventory_' . $sessionId,json_encode($item));
     }
 
     private function initializeCache($sessionId)
