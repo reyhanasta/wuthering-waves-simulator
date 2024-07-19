@@ -20,12 +20,13 @@ class StandardBanner extends Component
 
     public $characters = [];
     public $cacheDuration = 120; // Cache duration in minutes
-   
+
     public $cachedData;
     public $gachaResults=[];
 
     public $sessionId;
     public $bgImg;
+    public $weaponColor = 'cyan';
 
     public function mount(CharacterService $characterService)
     {
@@ -35,6 +36,8 @@ class StandardBanner extends Component
         $this->cachedData = $this->getCacheData($sessionId);
     }
 
+
+
     public function singlePull()
     {
         $this->sessionId = Session::getId();
@@ -42,7 +45,8 @@ class StandardBanner extends Component
         $gachaResult = $this->getGachaResult($this->sessionId);
         Redis::incr('totalPulls_count_' . $this->sessionId);
         $this->cachedData = $this->getCacheData($this->sessionId);
-        if ($gachaResult) { 
+        if ($gachaResult) {
+            $this->bgImg = '';
             $this->gachaResults = [[
                 'id' => $gachaResult->id,
                 'name' => $gachaResult->name,
@@ -71,8 +75,9 @@ class StandardBanner extends Component
         }
         Redis::incrby('totalPulls_count_' . $this->sessionId, 10);
         $this->cachedData = $this->getCacheData($this->sessionId);
+        $this->bgImg = '';
         $this->gachaResults = $results;
-        
+
     }
 
     private function getGachaResult($sessionId)
@@ -122,9 +127,9 @@ class StandardBanner extends Component
 
     private function getCacheData($sessionId)
     {
-    
+
         return [
-           
+
             'totalPulls' => Redis::get('totalPulls_count_' . $sessionId) ?? 0,
             'pitty4' => Redis::get('pitty4_count_' . $sessionId) ?? 0,
             'pitty5' => Redis::get('pitty5_count_' . $sessionId) ?? 0
@@ -152,6 +157,16 @@ class StandardBanner extends Component
                 break;
             default:
                 break;
+        }
+    }
+    public function weaponColor($rarity)
+    {
+        if($rarity == 1){
+            $this->weaponColor = '#ffe0a9';
+        }elseif($rarity == 2){
+            $this->weaponColor ='#df96e6';
+        }else {
+            $this->weaponColor = 'cyan';
         }
     }
 
