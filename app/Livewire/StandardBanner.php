@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Weapon;
 use Livewire\Component;
+use App\Services\CharacterService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Session;
@@ -16,6 +17,8 @@ class StandardBanner extends Component
         '2' => 6.0,
         '3' => 93.5,
     ];
+
+    public $characters = [];
     public $cacheDuration = 120; // Cache duration in minutes
    
     public $cachedData;
@@ -24,9 +27,10 @@ class StandardBanner extends Component
     public $sessionId;
     public $bgImg;
 
-    public function mount()
+    public function mount(CharacterService $characterService)
     {
         $sessionId = Session::getId();
+        $this->characters = $characterService->getData();
         $this->bgImg = Storage::url('public/images/background/gacha-banner.jpg');
         $this->cachedData = $this->getCacheData($sessionId);
     }
