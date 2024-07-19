@@ -3,20 +3,16 @@
         <div id="gachaContainer" class="flex flex-col items-center justify-center gap-3 lg:grid-cols-1">
             <div id="bannerArea" class="flex flex-col items-start">
                 <img id="bannerImg" class="max-w-2xl shadow-lg rounded-2xl" src="{{ $bgImg }}" alt="">
-                <div id="gachaResult" class="max-w-2xl m-5 grid grid-cols-5 grid-rows-1 gap-2 justify-center ">
+                <div id="gachaResult" class="grid justify-center max-w-2xl grid-cols-5 grid-rows-1 gap-2 m-5 ">
                     @foreach ($gachaResults as $item)
                     <div id="weapon-list" class="relative p-2 overflow-hidden bg-gray-800 shadow-lg rounded-xl">
                         <div class="absolute top-0 left-0 p-1 text-xs font-bold text-white bg-yellow-500">New</div>
                         <img class="object-cover w-full h-32" src="{{ $item['img'] }}" alt="{{ $item['name'] }}"
-                            style="background-color: {{$weaponColor}}" />
+                            style="background-color: {{$item['color']}}" />
                         <div class="p-2">
                             <div class="flex justify-center">
                                 <span class="text-xs text-yellow-400">
-
-                                    {{ $item['rarity'] === 1 ? '★★★★★' : '' }}
-                                    {{ $item['rarity'] === 2 ? '★★★★' : '' }}
-                                    {{ $item['rarity'] === 3 ? '★★★' : '' }}
-
+                                    {{ $item['stars']  }}
                                 </span>
                             </div>
                             <div class="mt-2 text-center">
@@ -26,8 +22,8 @@
                     </div>
                     @endforeach
                 </div>
-                <div id="statusArea" class="flex w-full dark:text-white font-semibold">
-                    <div class="grid grid-cols-2 w-full">
+                <div id="statusArea" class="flex w-full font-semibold dark:text-white">
+                    <div class="grid w-full grid-cols-2">
                         <div id="pullStatus" class="justify-start">
                             <div id="pullCounter">
                                 <ul class="ml-6 list-disc">
@@ -43,7 +39,7 @@
                                     <li class="grid m-2 place-items-center">
                                         <button type="button" data-modal-target="default-modal"
                                             data-modal-toggle="default-modal"
-                                            class="flex items-center text-sm  hover:text-blue-500"
+                                            class="flex items-center text-sm hover:text-blue-500"
                                             rel="noopener noreferrer"> <svg xmlns="http://www.w3.org/2000/svg"
                                                 fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                                                 class="size-6">
@@ -55,7 +51,7 @@
                                         <x-layouts.inventory></x-layouts.inventory>
                                     </li>
                                     <li class="grid place-items-center">
-                                        <button type="button" class="flex items-center text-sm  hover:text-blue-500"
+                                        <button type="button" class="flex items-center text-sm hover:text-blue-500"
                                             rel="noopener noreferrer"> <svg xmlns="http://www.w3.org/2000/svg"
                                                 fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                                                 class="size-6">
@@ -66,7 +62,7 @@
                                         </button>
                                     </li>
                                     <li class="grid place-items-center">
-                                        <button type="button" class="flex items-center text-sm  hover:text-blue-500"
+                                        <button type="button" class="flex items-center text-sm hover:text-blue-500"
                                             rel="noopener noreferrer"> <svg xmlns="http://www.w3.org/2000/svg"
                                                 fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                                                 class="size-6">
@@ -83,7 +79,7 @@
                         </div>
 
 
-                        <div id="pullsArea" class="grid grid-cols-2 justify-end items-center gap-5">
+                        <div id="pullsArea" class="grid items-center justify-end grid-cols-2 gap-5">
                             <button type="button" wire:click="singlePull">Gacha</button>
                             <button type="button" wire:click="tenPulls">Gacha 10x</button>
                         </div>
