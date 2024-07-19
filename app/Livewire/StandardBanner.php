@@ -23,6 +23,7 @@ class StandardBanner extends Component
 
     public $sessionId;
     public $bgImg;
+    public $weaponColor = 'cyan';
 
     public function mount()
     {
@@ -152,6 +153,16 @@ class StandardBanner extends Component
                 break;
             default:
                 break;
+        }
+    }
+    public function weaponColor($rarity)
+    {
+        if($rarity == 1){
+            $this->weaponColor = '#ffe0a9';
+        }elseif($rarity == 2){
+            $this->weaponColor ='#df96e6';
+        }else {
+            $this->weaponColor = 'cyan';
         }
     }
 
