@@ -16,15 +16,16 @@ class RaritySeeder extends Seeder
 
        Rarity::insert([
             'level' => 'SSR',
-
+            'drop_rates' => 0.8
         ]);
        Rarity::insert([
             'level' => 'SR',
-
+            'drop_rates' => 6.0
         ]);
 
        Rarity::insert([
             'level' => 'R',
+            'drop_rates' => 93.2
         ]);
     }
 }

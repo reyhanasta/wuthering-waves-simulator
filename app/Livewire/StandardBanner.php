@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Rarity;
 use App\Models\Weapon;
 use Livewire\Component;
 use Illuminate\Support\Facades\Cache;
@@ -11,11 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 class StandardBanner extends Component
 {
-    public $rarityProbabilities = [
-        '1' => 0.5,
-        '2' => 6.0,
-        '3' => 93.5,
-    ];
+    
     public $cacheDuration = 120; // Cache duration in minutes
    
     public $cachedData;
@@ -24,11 +21,16 @@ class StandardBanner extends Component
     public $sessionId;
     public $bgImg;
 
+    public  $get5starId;
+    public $get4starId;
+  
+    public $baseDropRates;
     public $weaponColor = 'cyan';
 
     public function mount()
     {
         $sessionId = Session::getId();
+        $this->baseDropRates = Rarity::all();
         $this->bgImg = Storage::url('public/images/background/gacha-banner.jpg');
         $this->cachedData = $this->getCacheData($sessionId);
     }
@@ -38,12 +40,12 @@ class StandardBanner extends Component
         $this->sessionId = Session::getId();
         $this->initializeCache($this->sessionId);
         $gachaResult = $this->getGachaResult($this->sessionId);
-       
         Redis::incr('totalPulls_count_' . $this->sessionId);
         $this->cachedData = $this->getCacheData($this->sessionId);
         if ($gachaResult) { 
             $this->bgImg='';
-            $this->gachaResults = [[
+            $this->gachaResults = [
+                [
                 'id' => $gachaResult->id,
                 'name' => $gachaResult->name,
                 'img' => Storage::url($gachaResult->img),
@@ -51,7 +53,8 @@ class StandardBanner extends Component
                 'rarity' => $gachaResult->rarity,
                 'color' =>   $this->colorPick($gachaResult->rarity),
                 'stars' =>  $this->weaponStars($gachaResult->rarity),
-                ]];
+                ]
+            ];
          } else {
             $this->gachaResults = ['errors'];
         }
@@ -87,26 +90,31 @@ class StandardBanner extends Component
         $rand = mt_rand(0, 10000) / 100;
         $fourstarPitty = Redis::incr('pitty4_count_' . $sessionId);
         $fivestarPitty = Redis::incr('pitty5_count_' . $sessionId);
-
-        $increasedDropRate = ($fivestarPitty >= 70) ? $this->rarityProbabilities[1] * 1.8 + (1 / 100) : $this->rarityProbabilities[1];
-
+        //Ambil data drop rate
+        $fiveStarDropRates = Rarity::where('level','SSR')->value('drop_rates');
+        $this->get5starId = Rarity::where('level','SSR')->value('id');
+        $this->get4starId = Rarity::where('level','SR')->value('id');
+        //Soft pity
+        $increasedDropRate = ($fivestarPitty >= 70) ? $fiveStarDropRates * 1.8 + (1 / 100) :  $fiveStarDropRates;
+       
+        //4-Star guaranteed per 10 pulls
         if ($fourstarPitty >= 10 && $fivestarPitty < 80) {
-            $this->resetPitty(2, $sessionId);
-            return $this->getRandomWeaponByRarity(2);
+            $this->resetPitty($this->get4starId, $sessionId);
+            return $this->getRandomWeaponByRarity($this->get4starId);
         }
-
+        //5-Star guaranteed per 80 pulls
         if ($fivestarPitty == 80) {
-            $this->resetPitty(1, $sessionId);
-            return $this->getRandomWeaponByRarity(1);
+            $this->resetPitty($this->get5starId, $sessionId);
+            return $this->getRandomWeaponByRarity($this->get5starId);
         }
 
         $cumulativeProbability = 0;
-        foreach ($this->rarityProbabilities as $rarity => $probability) {
-            $cumulativeProbability += ($rarity == 1) ? $probability * $increasedDropRate : $probability;
+        foreach ($this->dropRates as $rates) {
+            //Soft pity check
+            $cumulativeProbability += ($rates->level == 'SSR') ? $rates->drop_rates * $increasedDropRate : $rates->drop_rates;
             if ($rand <= $cumulativeProbability) {
-                $this->resetPitty($rarity, $sessionId);
-                
-                return $this->getRandomWeaponByRarity($rarity);
+                $this->resetPitty($rates->id, $sessionId);
+                return $this->getRandomWeaponByRarity($rates->id);
             }
         }
 
@@ -129,9 +137,7 @@ class StandardBanner extends Component
 
     private function getCacheData($sessionId)
     {
-    
         return [
-           
             'totalPulls' => Redis::get('totalPulls_count_' . $sessionId) ?? 0,
             'pitty4' => Redis::get('pitty4_count_' . $sessionId) ?? 0,
             'pitty5' => Redis::get('pitty5_count_' . $sessionId) ?? 0
@@ -143,18 +149,17 @@ class StandardBanner extends Component
         $weapons = Cache::remember("weapons_rarity_{$rarity}", $this->cacheDuration * 60, function () use ($rarity) {
             return Weapon::where('rarity', $rarity)->get();
         });
-
         return $weapons->random();
     }
 
     public function resetPitty($rarity, $sessionId)
     {
         switch ($rarity) {
-            case 1:
+            case $this->get5starId :
                 Redis::setex('pitty5_count_' . $sessionId, $this->cacheDuration * 60, 0);
                 Redis::setex('pitty4_count_' . $sessionId, $this->cacheDuration * 60, 0);
                 break;
-            case 2:
+            case $this->get4starId :
                 Redis::setex('pitty4_count_' . $sessionId, $this->cacheDuration * 60, 0);
                 break;
             default:
@@ -163,22 +168,23 @@ class StandardBanner extends Component
     }
 
     public function colorPick($rarity){
-            if($rarity == 1){
+            if($rarity == $this->get5starId){
                     return 'gold';
-            }else if($rarity == 2){
+            }else if($rarity == $this->get4starId){
                 return 'pink';
             }
             return 'cyan';
     }
 
     public function weaponStars($rarity){
-        if($rarity == 1){
+        if($rarity == $this->get5starId){
             return '★★★★★';
-        }else if($rarity == 2){
+        }else if($rarity == $this->get4starId){
             return '★★★★';
         }
         return '★★★';
     }
+
 
     public function render()
     {
