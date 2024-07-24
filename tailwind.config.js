@@ -6,7 +6,11 @@ export default {
     "./resources/**/*.vue",
   ],
   theme: {
-    extend: {},
+    extend: {
+        backgroundImage: {
+            'gacha-result-bg': "url('/storage/public/images/background/T_LuckdrawShare.png')",
+        }
+    },
   },
   plugins: [
     require('flowbite/plugin')

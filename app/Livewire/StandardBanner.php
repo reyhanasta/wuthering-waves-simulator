@@ -12,18 +12,19 @@ use Illuminate\Support\Facades\Storage;
 
 class StandardBanner extends Component
 {
-    
+
     public $cacheDuration = 120; // Cache duration in minutes
-   
+
     public $cachedData;
     public $gachaResults=[];
 
     public $sessionId;
     public $bgImg;
+    public $gachaImgBg;
 
     public  $get5starId;
     public $get4starId;
-  
+
     public $baseDropRates;
     public $weaponColor = 'cyan';
 
@@ -32,6 +33,7 @@ class StandardBanner extends Component
         $sessionId = Session::getId();
         $this->baseDropRates = Rarity::all();
         $this->bgImg = Storage::url('public/images/background/gacha-banner.jpg');
+        $this->gachaImgBg = Storage::url('public/images/background/T_LuckdrawShare.jpg');
         $this->cachedData = $this->getCacheData($sessionId);
     }
 
@@ -42,7 +44,7 @@ class StandardBanner extends Component
         $gachaResult = $this->getGachaResult($this->sessionId);
         Redis::incr('totalPulls_count_' . $this->sessionId);
         $this->cachedData = $this->getCacheData($this->sessionId);
-        if ($gachaResult) { 
+        if ($gachaResult) {
             $this->bgImg='';
             $this->gachaResults = [
                 [
@@ -81,7 +83,7 @@ class StandardBanner extends Component
         Redis::incrby('totalPulls_count_' . $this->sessionId, 10);
         $this->cachedData = $this->getCacheData($this->sessionId);
         $this->gachaResults = $results;
-        
+
     }
 
     private function getGachaResult($sessionId)
@@ -96,7 +98,7 @@ class StandardBanner extends Component
         $this->get4starId = Rarity::where('level','SR')->value('id');
         //Soft pity
         $increasedDropRate = ($fivestarPitty >= 70) ? $fiveStarDropRates * 1.8 + (1 / 100) :  $fiveStarDropRates;
-       
+
         //4-Star guaranteed per 10 pulls
         if ($fourstarPitty >= 10 && $fivestarPitty < 80) {
             $this->resetPitty($this->get4starId, $sessionId);
@@ -109,7 +111,7 @@ class StandardBanner extends Component
         }
 
         $cumulativeProbability = 0;
-        foreach ($this->dropRates as $rates) {
+        foreach ($this->baseDropRates as $rates) {
             //Soft pity check
             $cumulativeProbability += ($rates->level == 'SSR') ? $rates->drop_rates * $increasedDropRate : $rates->drop_rates;
             if ($rand <= $cumulativeProbability) {
@@ -169,20 +171,20 @@ class StandardBanner extends Component
 
     public function colorPick($rarity){
             if($rarity == $this->get5starId){
-                    return 'gold';
+                    return 'bg-yellow-400';
             }else if($rarity == $this->get4starId){
-                return 'pink';
+                return 'bg-purple-500';
             }
-            return 'cyan';
+            return 'bg-cyan-500';
     }
 
     public function weaponStars($rarity){
         if($rarity == $this->get5starId){
-            return '★★★★★';
+            return 5;
         }else if($rarity == $this->get4starId){
-            return '★★★★';
+            return 4;
         }
-        return '★★★';
+        return 3;
     }
 
 

@@ -4,22 +4,24 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
+use App\Models\Rarity;
 use App\Models\Weapon;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
 use App\Models\WeaponType;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Filament\Resources\Resource;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\WeaponResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\WeaponResource\RelationManagers;
-use App\Models\Rarity;
-use Filament\Forms\Components\FileUpload;
 
 class WeaponResource extends Resource
 {
@@ -33,10 +35,16 @@ class WeaponResource extends Resource
             ->schema([
                 //
                 TextInput::make('name')
-                    ->translateLabel()->columnSpan(3),
+                    ->translateLabel()
+                    ->autocapitalize('words')
+                    ->columnSpan(2)
+                    ->live(onBlur:true)
+                    ->afterStateUpdated(function(string $state,Forms\Set $set){
+                        $set('slug',Str::slug($state));
+                    }),
                 TextInput::make('slug')
-                    ->translateLabel(),
-                FileUpload::make('img')->directory('images/weapons')->preserveFilenames(),
+                    ->translateLabel()
+                    ->readOnly(),
                 Select::make('rarity')
                     ->options(Rarity::all()
                         ->pluck('level', 'id')
@@ -48,6 +56,13 @@ class WeaponResource extends Resource
                             return ucwords($name);
                         })
                         ->toArray()),
+                // FileUpload::make('img')->directory('images/weapons')->preserveFilenames(),
+                FileUpload::make('img')
+                ->label('Upload Images')
+                ->directory('images/weapons')
+                ->preserveFilenames()
+                ->columnSpan(3),
+
             ])->columns(3);
     }
 
@@ -57,7 +72,11 @@ class WeaponResource extends Resource
             ->columns([
                 //
                 TextColumn::make('name')->searchable(),
-                TextColumn::make('weaponRarity.level')->sortable(),
+                TextColumn::make('weaponRarity.level')->sortable()->badge()->color(fn (string $state): string => match ($state) {
+                    'SSR' => 'danger',
+                    'SR' => 'warning',
+                    'R' => 'gray',
+                }),
                 TextColumn::make('weaponType.name')->sortable(),
             ])
             ->filters([
