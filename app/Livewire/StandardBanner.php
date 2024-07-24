@@ -14,10 +14,10 @@ class StandardBanner extends Component
 {
 
     public $cacheDuration = 120; // Cache duration in minutes
-
     public $cachedData;
-    public $gachaResults=[];
+    public $gachaResults = [];
 
+    public $displayStyle = 'hidden';
     public $sessionId;
     public $bgImg;
     public $gachaImgBg;
@@ -46,6 +46,7 @@ class StandardBanner extends Component
         $this->cachedData = $this->getCacheData($this->sessionId);
         if ($gachaResult) {
             $this->bgImg='';
+            $this->displayStyle='grid-cols-1';
             $this->gachaResults = [
                 [
                 'id' => $gachaResult->id,
@@ -69,6 +70,7 @@ class StandardBanner extends Component
             $this->weaponColor = $this->colorPick($gachaResult->rarity);
             if ($gachaResult) {
                 $this->bgImg='';
+                $this->displayStyle='grid-cols-5';
                 $results[] = [
                     'id' => $gachaResult->id,
                     'name' => $gachaResult->name,
@@ -175,7 +177,7 @@ class StandardBanner extends Component
             }else if($rarity == $this->get4starId){
                 return 'bg-purple-500';
             }
-            return 'bg-cyan-500';
+            return 'bg-slate-800';
     }
 
     public function weaponStars($rarity){

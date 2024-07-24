@@ -2,22 +2,24 @@
     <div class="grid gap-6 lg:grid-cols-1 lg:gap-12">
         <div id="gachaContainer" class="flex flex-col items-center justify-center gap-3 lg:grid-cols-1">
             <div class="flex flex-col items-center justify-center gap-3">
-                <div id="bannerArea" class="flex flex-col items-start ">
-                    <img id="bannerImg" class="max-w-2xl shadow-lg rounded-2xl " src="{{ $bgImg }}" alt="">
+                <div id="bannerArea" class="flex flex-col items-center">
+                    <img id="bannerImg" class="max-w-2xl m-4 shadow-lg rounded-2xl" src="{{ $bgImg }}" alt="">
                     <div id="gachaResult"
-                        class="grid grid-cols-5 gap-2 p-4 rounded-xl shadow-xl max-w-2xl bg-cover bg-center">
+                        class="grid max-w-2xl items-center gap-2 p-4 m-4 bg-gray-800 border-2 shadow-xl rounded-xl {{$displayStyle}}">
                         @foreach ($gachaResults as $item)
                         <div
-                            class="relative overflow-hidden bg-center rounded-md shadow-lg border-solid border-b-4 border-purple-500 {{$item['color']}}">
+                            class="relative overflow-hidden bg-gray-700 bg-center border-2 border-solid rounded-lg shadow-lg border-slate-500">
                             {{-- Jika ada Item baru --}}
                             <div class="absolute top-0 left-0 p-1 text-xs font-bold text-white bg-yellow-500">New</div>
-                            <img class="w-full h-40 object-cover border-b-2 " src="{{ $item['img'] }}"
-                                alt="{{ $item['name'] }}">
-                            <div class="flex justify-center ">
-                                <p class="text-xl text-yellow-400">{{ str_repeat('★', $item['stars']) }}</p>
+                            <div class="relative ">
+                                <img class="object-cover w-full h-40 border-b-2 " src="{{ $item['img'] }}"
+                                    alt="{{ $item['name'] }}">
+                                <div class="absolute bottom-0 right-0">
+                                    <p class="text-xl text-yellow-400">{{ str_repeat('★', $item['stars']) }}</p>
+                                </div>
                             </div>
-                            <div class="mx-1 mb-1 text-center">
-                                <p class="text-white text-md">{{ $item['name'] }}</p>
+                            <div class="m-3 text-lg text-center text-white text-wrap ">
+                                <p class="">{{ $item['name'] }}</p>
                             </div>
                         </div>
                         @endforeach

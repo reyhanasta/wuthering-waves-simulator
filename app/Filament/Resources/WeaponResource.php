@@ -41,7 +41,7 @@ class WeaponResource extends Resource
                     ->live(onBlur:true)
                     ->afterStateUpdated(function(string $state,Forms\Set $set){
                         $set('slug',Str::slug($state));
-                    }),
+                    })->required(),
                 TextInput::make('slug')
                     ->translateLabel()
                     ->readOnly(),
@@ -61,7 +61,7 @@ class WeaponResource extends Resource
                 ->label('Upload Images')
                 ->directory('images/weapons')
                 ->preserveFilenames()
-                ->columnSpan(3),
+                ->columnSpan(3)->required(),
 
             ])->columns(3);
     }
