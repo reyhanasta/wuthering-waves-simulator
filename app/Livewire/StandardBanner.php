@@ -15,6 +15,7 @@ class StandardBanner extends Component
 
     public $cacheDuration = 120; // Cache duration in minutes
     public $cachedData;
+    public $resetCache;
     public $gachaResults = [];
 
     public $displayStyle = 'hidden';
@@ -30,11 +31,11 @@ class StandardBanner extends Component
 
     public function mount()
     {
-        $sessionId = Session::getId();
+        $this->sessionId = Session::getId();
         $this->baseDropRates = Rarity::all();
         $this->bgImg = Storage::url('public/images/background/gacha-banner.jpg');
         $this->gachaImgBg = Storage::url('public/images/background/T_LuckdrawShare.jpg');
-        $this->cachedData = $this->getCacheData($sessionId);
+        $this->cachedData = $this->getCacheData($this->sessionId);
     }
 
     public function singlePull()
@@ -85,7 +86,6 @@ class StandardBanner extends Component
         Redis::incrby('totalPulls_count_' . $this->sessionId, 10);
         $this->cachedData = $this->getCacheData($this->sessionId);
         $this->gachaResults = $results;
-
     }
 
     private function getGachaResult($sessionId)
@@ -121,8 +121,16 @@ class StandardBanner extends Component
                 return $this->getRandomWeaponByRarity($rates->id);
             }
         }
-
         return null;
+    }
+
+    public function setPittyDefault($sessionId)
+    {
+        return [
+            'totalPulls' => Redis::set('totalPulls_count_' . $sessionId,0) ?? 0,
+            'pitty4' => Redis::set('pitty4_count_' . $sessionId,0) ?? 0,
+            'pitty5' => Redis::set('pitty5_count_' . $sessionId,0) ?? 0
+        ];
     }
 
 
@@ -147,6 +155,7 @@ class StandardBanner extends Component
             'pitty5' => Redis::get('pitty5_count_' . $sessionId) ?? 0
         ];
     }
+
 
     private function getRandomWeaponByRarity($rarity)
     {

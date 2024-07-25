@@ -5,21 +5,21 @@
                 <div id="bannerArea" class="flex flex-col items-center">
                     <img id="bannerImg" class="max-w-2xl m-4 shadow-lg rounded-2xl" src="{{ $bgImg }}" alt="">
                     <div id="gachaResult"
-                        class="grid max-w-2xl items-center gap-2 p-4 m-4 bg-gray-800 border-2 shadow-xl rounded-xl {{$displayStyle}}">
+                        class="grid max-w-2xl gap-2 p-4 m-4 bg-gray-800 border-2 shadow-xl rounded-xl {{$displayStyle}}">
                         @foreach ($gachaResults as $item)
                         <div
                             class="relative overflow-hidden bg-gray-700 bg-center border-2 border-solid rounded-lg shadow-lg border-slate-500">
                             {{-- Jika ada Item baru --}}
                             <div class="absolute top-0 left-0 p-1 text-xs font-bold text-white bg-yellow-500">New</div>
                             <div class="relative ">
-                                <img class="object-cover w-full h-40 border-b-2 " src="{{ $item['img'] }}"
+                                <img class="object-cover w-full h-40 border-b-2" src="{{ $item['img'] }}"
                                     alt="{{ $item['name'] }}">
                                 <div class="absolute bottom-0 right-0">
                                     <p class="text-xl text-yellow-400">{{ str_repeat('★', $item['stars']) }}</p>
                                 </div>
                             </div>
-                            <div class="m-3 text-lg text-center text-white text-wrap ">
-                                <p class="">{{ $item['name'] }}</p>
+                            <div class="p-2 max-w-md">
+                                <p class="text-md text-center text-white">{{ $item['name'] }}</p>
                             </div>
                         </div>
                         @endforeach
@@ -53,7 +53,7 @@
                                             <x-layouts.inventory></x-layouts.inventory>
                                         </li>
                                         <li class="grid place-items-center">
-                                            <button type="button" class="flex items-center text-sm hover:text-blue-500"
+                                            <button type="button" wire:click="setPittyDefault({{$sessionId}})" x-on:click="$wire.$refresh()" class="flex items-center text-sm hover:text-blue-500"
                                                 rel="noopener noreferrer"> <svg xmlns="http://www.w3.org/2000/svg"
                                                     fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                                     stroke="currentColor" class="size-6">
