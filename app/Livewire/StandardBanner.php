@@ -176,19 +176,6 @@ class StandardBanner extends Component
         }
     }
 
-    private function addToInventory($gachaResult, $sessionId)
-    {
-        $inventory = $this->getInventory($sessionId);
-        $inventory[] = $gachaResult->id; // Store the weapon ID or any necessary data
-        Redis::setex('inventory_' . $sessionId, $this->cacheDuration * 60, json_encode($inventory));
-    }
-
-    private function getInventory($sessionId)
-    {
-        $inventory = Redis::get('inventory_' . $sessionId);
-        return $inventory ? json_decode($inventory, true) : [];
-    }
-
     public function colorPick($rarity)
     {
         return match ($rarity) {
@@ -211,13 +198,25 @@ class StandardBanner extends Component
     public function render()
     {
 
-        return view('livewire.standard-banner', [
-            'inventoryItems' => $this->fetchInventoryItems(),
-        ]);
+        return view('livewire.standard-banner');
     }
 
-    private function fetchInventoryItems()
+    //MODUL INVENTORY
+    private function addToInventory($gachaResult, $sessionId)
     {
-        return Weapon::whereIn('id', $this->inventory)->get();
+        $inventory = $this->getInventory($sessionId);
+        $inventory[] = $gachaResult->id; // Store the weapon ID or any necessary data
+        Redis::setex('inventory_' . $sessionId, $this->cacheDuration * 60, json_encode($inventory));
     }
+
+    private function getInventory($sessionId)
+    {
+        $inventory = Redis::get('inventory_' . $sessionId);
+        return $inventory ? json_decode($inventory, true) : [];
+    }
+
+    // private function fetchInventoryItems()
+    // {
+    //     return Weapon::whereIn('id', $this->inventory)->get();
+    // }
 }

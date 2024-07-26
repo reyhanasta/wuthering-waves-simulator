@@ -45,7 +45,7 @@
                                                 </svg>
                                                 Inventory
                                             </button>
-                                            <x-layouts.inventory :inventoryItems="$inventoryItems"></x-layouts.inventory>
+                                            {{-- <x-layouts.inventory :inventoryItems="$inventoryItems"></x-layouts.inventory> --}}
                                         </li>
                                         <li class="grid place-items-center">
                                             <button type="button" wire:click="setPityDefault({{ $sessionId }})" class="flex items-center text-sm hover:text-blue-500" aria-label="Reset">
@@ -81,3 +81,4 @@
 
     </div>
 </main>
+<livewire:inventory :sessionId="$sessionId" />
