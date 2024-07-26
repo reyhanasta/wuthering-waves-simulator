@@ -23,6 +23,7 @@ class StandardBanner extends Component
     public $displayStyle = 'hidden';
     public $sessionId;
     public $bgImg;
+    public $ownedStatus ="no";
     public $gachaImgBg;
 
     public $get5starId;
@@ -52,8 +53,10 @@ class StandardBanner extends Component
         if ($gachaResult) {
             $this->bgImg = '';
             $this->displayStyle = 'grid-cols-1';
-            $this->gachaResults = [$this->formatGachaResult($gachaResult)];
             $this->addToInventory($gachaResult, $this->sessionId);
+            $this->gachaResults = [$this->formatGachaResult($gachaResult)];
+             // Dispatch event to update inventory
+            $this->dispatch('inventory-updated', $this->sessionId);
         } else {
             $this->gachaResults = ['errors'];
         }
@@ -68,8 +71,9 @@ class StandardBanner extends Component
             if ($gachaResult) {
                 $this->bgImg = '';
                 $this->displayStyle = 'grid-cols-5';
-                $results[] = $this->formatGachaResult($gachaResult);
                 $this->addToInventory($gachaResult, $this->sessionId);
+                $results[] = $this->formatGachaResult($gachaResult);
+                $this->dispatch('inventory-updated', $this->sessionId);
             }
         }
         Redis::incrby('totalPulls_count_' . $this->sessionId, 10);
@@ -157,6 +161,7 @@ class StandardBanner extends Component
             'rarity' => $gachaResult->rarity,
             'color' => $this->colorPick($gachaResult->rarity),
             'stars' => $this->weaponStars($gachaResult->rarity),
+            'owned' => $this->ownedStatus,
         ];
     }
 
@@ -175,6 +180,10 @@ class StandardBanner extends Component
         } elseif ($rarity == $this->get4starId) {
             Redis::setex('pity4_count_' . $sessionId, $this->cacheDuration * 60, 0);
         }
+    }
+    public function resetAllRecords()
+    {
+        Cache::flush();
     }
 
     public function colorPick($rarity)
@@ -198,7 +207,6 @@ class StandardBanner extends Component
 
     public function render()
     {
-
         return view('livewire.standard-banner');
     }
 
@@ -207,16 +215,21 @@ class StandardBanner extends Component
     {
         $key = 'inventory_' . $sessionId;
         $itemKey = 'item_' . $gachaResult->id;
-        $currentCount = Redis::hget($key, $itemKey) ?? 0;
-
-        Redis::hset($key, $itemKey, $currentCount + 1);
+    
+        if (Redis::hexists($key, $itemKey)) {
+            $this->ownedStatus = 'yes';
+            Redis::hincrby($key, $itemKey, 1);
+        } else {
+            $this->ownedStatus = 'no';
+            Redis::hset($key, $itemKey, 1);
+        }
     }
 
     private function getInventory($sessionId)
     {
         $key = 'inventory_' . $sessionId;
         $inventory = Redis::hgetall($key);
-
+        
         if (!$inventory) {
             return [];
         }
@@ -224,8 +237,4 @@ class StandardBanner extends Component
         return $inventory;
     }
 
-    // private function fetchInventoryItems()
-    // {
-    //     return Weapon::whereIn('id', $this->inventory)->get();
-    // }
 }
