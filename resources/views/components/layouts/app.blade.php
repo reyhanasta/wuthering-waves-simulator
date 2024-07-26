@@ -20,6 +20,8 @@
                     </div>
                 </header>
                 {{ $slot }}
+                <!-- Include the Inventory Component -->
+
 
             </div>
         </div>
