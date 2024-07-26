@@ -18,8 +18,8 @@ class Inventory extends Component
     private function fetchInventoryItems($sessionId)
     {
         $inventory = Redis::hgetall('inventory_' . $sessionId);
-        dd($inventory);
         $itemIds = array_keys($inventory);
+        dd($itemIds);
         $items = Weapon::whereIn('id', $itemIds)->get();
 
         foreach ($items as $item) {

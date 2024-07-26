@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Log;
 use App\Models\Rarity;
 use App\Models\Weapon;
 use Livewire\Component;
@@ -204,15 +205,23 @@ class StandardBanner extends Component
     //MODUL INVENTORY
     private function addToInventory($gachaResult, $sessionId)
     {
-        $inventory = $this->getInventory($sessionId);
-        $inventory[] = $gachaResult->id; // Store the weapon ID or any necessary data
-        Redis::setex('inventory_' . $sessionId, $this->cacheDuration * 60, json_encode($inventory));
+        $key = 'inventory_' . $sessionId;
+        $itemKey = 'item_' . $gachaResult->id;
+        $currentCount = Redis::hget($key, $itemKey) ?? 0;
+
+        Redis::hset($key, $itemKey, $currentCount + 1);
     }
 
     private function getInventory($sessionId)
     {
-        $inventory = Redis::get('inventory_' . $sessionId);
-        return $inventory ? json_decode($inventory, true) : [];
+        $key = 'inventory_' . $sessionId;
+        $inventory = Redis::hgetall($key);
+
+        if (!$inventory) {
+            return [];
+        }
+
+        return $inventory;
     }
 
     // private function fetchInventoryItems()
