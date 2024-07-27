@@ -6,7 +6,7 @@
             <!-- Modal header -->
             <div class="flex items-center justify-between p-4 border-b rounded-t md:p-5 dark:border-black">
                 <h3 class="text-xl font-semibold text-black">
-                    Terms of Service
+                    Inventory
                 </h3>
                 <button type="button"
                     class="inline-flex items-center justify-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:bg-gray-200 hover:text-gray-900 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
@@ -22,8 +22,16 @@
             <!-- Modal body -->
             <div class="p-4 space-y-4 md:p-5">
                 <div id="inventory" class="mt-8">
-                    <h2 class="text-xl font-bold">Inventory</h2>
-                   
+                    <div class="grid grid-cols-5 gap-4">
+                        @foreach ($inventoryItems as $item)
+                            <div class="p-4 border border-gray-300 rounded-2xl">
+                                <img src="{{ Storage::url($item->img) }}" alt="{{ $item->name }}" class="object-cover w-full h-32 rounded-lg">
+                                <h3 class="mt-2 text-lg font-semibold">{{ $item->name }}</h3>
+                                <p class="text-sm text-gray-600">{{ $item->count }}</p>
+                                <p class="text-yellow-400">{{ str_repeat('★', $item->rarity) }}</p>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
             <!-- Modal footer -->
@@ -35,3 +43,4 @@
         </div>
     </div>
 </div>
+

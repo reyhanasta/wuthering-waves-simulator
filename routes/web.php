@@ -13,7 +13,7 @@ Route::post('/perform-gacha', [GachaController::class, 'performGacha'])->name('g
 Route::post('/perform-ten-gacha', [GachaController::class, 'performTenGacha'])->name('multiple-gacha.perform');
 Route::get('/reset-gacha', [GachaController::class, 'resetGacha'])->name('gacha.reset');
 
-Route::get('/standard-banner',LivewireStandardBanner::class);
+Route::get('/standard-banner',LivewireStandardBanner::class)->name('standard-banner');
 
 
 

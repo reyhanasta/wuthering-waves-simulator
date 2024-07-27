@@ -13,17 +13,17 @@ use Illuminate\Support\Facades\Storage;
 
 class StandardBanner extends Component
 {
-
     public $cacheDuration = 120; // Cache duration in minutes
     public $cachedData;
     public $resetCache;
     public $gachaResults = [];
     public $inventory = [];
+    public $inventoryItems = [];
 
     public $displayStyle = 'hidden';
     public $sessionId;
     public $bgImg;
-    public $ownedStatus ="no";
+    public $ownedStatus = "no";
     public $gachaImgBg;
 
     public $get5starId;
@@ -35,28 +35,28 @@ class StandardBanner extends Component
     public function mount()
     {
         $this->sessionId = Session::getId();
-        $this->baseDropRates = Rarity::all();
+        $this->baseDropRates = Cache::remember('baseDropRates', $this->cacheDuration * 60, function () {
+            return Rarity::all();
+        });
         $this->bgImg = Storage::url('public/images/background/gacha-banner.jpg');
         $this->gachaImgBg = Storage::url('public/images/background/T_LuckdrawShare.jpg');
-        $this->cachedData = $this->getCacheData($this->sessionId);
-        $this->inventory = $this->getInventory($this->sessionId);
+        $this->cachedData = $this->getCacheData();
+        $this->inventory = $this->getInventory();
     }
 
     public function singlePull()
     {
-        $this->sessionId = Session::getId();
-        $this->initializeCache($this->sessionId);
-        $gachaResult = $this->getGachaResult($this->sessionId);
+        $this->initializeCache();
+        $gachaResult = $this->getGachaResult();
         Redis::incr('totalPulls_count_' . $this->sessionId);
-        $this->cachedData = $this->getCacheData($this->sessionId);
+        $this->cachedData = $this->getCacheData();
 
         if ($gachaResult) {
             $this->bgImg = '';
             $this->displayStyle = 'grid-cols-1';
-            $this->addToInventory($gachaResult, $this->sessionId);
+            $this->addToInventory($gachaResult);
             $this->gachaResults = [$this->formatGachaResult($gachaResult)];
-             // Dispatch event to update inventory
-            $this->dispatch('inventory-updated', $this->sessionId);
+            $this->refreshInventory();
         } else {
             $this->gachaResults = ['errors'];
         }
@@ -66,72 +66,61 @@ class StandardBanner extends Component
     {
         $results = [];
         for ($i = 0; $i < 10; $i++) {
-            $gachaResult = $this->getGachaResult($this->sessionId);
+            $gachaResult = $this->getGachaResult();
             $this->weaponColor = $this->colorPick($gachaResult->rarity);
             if ($gachaResult) {
                 $this->bgImg = '';
                 $this->displayStyle = 'grid-cols-5';
-                $this->addToInventory($gachaResult, $this->sessionId);
+                $this->addToInventory($gachaResult);
                 $results[] = $this->formatGachaResult($gachaResult);
-                $this->dispatch('inventory-updated', $this->sessionId);
+                $this->refreshInventory();
             }
         }
         Redis::incrby('totalPulls_count_' . $this->sessionId, 10);
-        $this->cachedData = $this->getCacheData($this->sessionId);
+        $this->cachedData = $this->getCacheData();
+
         $this->gachaResults = $results;
     }
 
-    private function getGachaResult($sessionId)
+    private function getGachaResult()
     {
-        // Logika untuk mendapatkan hasil gacha
         $rand = mt_rand(0, 10000) / 100;
-        $fourstarpity = Redis::incr('pity4_count_' . $sessionId);
-        $fivestarpity = Redis::incr('pity5_count_' . $sessionId);
-        //Ambil data drop rate
-        $fiveStarDropRates = Rarity::where('level', 'SSR')->value('drop_rates');
-        $this->get5starId = Rarity::where('level', 'SSR')->value('id');
-        $this->get4starId = Rarity::where('level', 'SR')->value('id');
-        //Soft pity
+        $fourstarpity = Redis::incr('pity4_count_' . $this->sessionId);
+        $fivestarpity = Redis::incr('pity5_count_' . $this->sessionId);
+
+        $fiveStarDropRates = $this->baseDropRates->firstWhere('level', 'SSR')->drop_rates;
+        $this->get5starId = $this->baseDropRates->firstWhere('level', 'SSR')->id;
+        $this->get4starId = $this->baseDropRates->firstWhere('level', 'SR')->id;
+
         $increasedDropRate = ($fivestarpity >= 70) ? $fiveStarDropRates * 1.8 + (1 / 100) :  $fiveStarDropRates;
 
-        //4-Star guaranteed per 10 pulls
         if ($fourstarpity >= 10 && $fivestarpity < 80) {
-            $this->resetpity($this->get4starId, $sessionId);
+            $this->resetPity($this->get4starId);
             return $this->getRandomWeaponByRarity($this->get4starId);
         }
-        //5-Star guaranteed per 80 pulls
+
         if ($fivestarpity == 80) {
-            $this->resetpity($this->get5starId, $sessionId);
+            $this->resetPity($this->get5starId);
             return $this->getRandomWeaponByRarity($this->get5starId);
         }
 
         $cumulativeProbability = 0;
         foreach ($this->baseDropRates as $rates) {
-            //Soft pity check
-            $cumulativeProbability += ($rates->level == 'SSR') ? $rates->drop_rates * $increasedDropRate : $rates->drop_rates;
+            $cumulativeProbability += ($rates->level == 'SSR') ? $increasedDropRate : $rates->drop_rates;
             if ($rand <= $cumulativeProbability) {
-                $this->resetpity($rates->id, $sessionId);
+                $this->resetPity($rates->id);
                 return $this->getRandomWeaponByRarity($rates->id);
             }
         }
         return null;
     }
 
-    // public function setpityDefault($sessionId)
-    // {
-    //     return [
-    //         'totalPulls' => Redis::set('totalPulls_count_' . $sessionId,0) ?? 0,
-    //         'pity4' => Redis::set('pity4_count_' . $sessionId,0) ?? 0,
-    //         'pity5' => Redis::set('pity5_count_' . $sessionId,0) ?? 0
-    //     ];
-    // }
-
-    private function initializeCache($sessionId)
+    private function initializeCache()
     {
-        $this->cacheWithDefault('totalPulls_count_' . $sessionId, 0);
-        $this->cacheWithDefault('pity4_count_' . $sessionId, 0);
-        $this->cacheWithDefault('pity5_count_' . $sessionId, 0);
-        $this->cacheWithDefault('inventory_' . $sessionId, []);
+        $this->cacheWithDefault('totalPulls_count_' . $this->sessionId, 0);
+        $this->cacheWithDefault('pity4_count_' . $this->sessionId, 0);
+        $this->cacheWithDefault('pity5_count_' . $this->sessionId, 0);
+        $this->cacheWithDefault('inventory_' . $this->sessionId, []);
     }
 
     private function cacheWithDefault($key, $default)
@@ -141,13 +130,13 @@ class StandardBanner extends Component
         }
     }
 
-    private function getCacheData($sessionId)
+    private function getCacheData()
     {
         return [
-            'totalPulls' => Redis::get('totalPulls_count_' . $sessionId) ?? 0,
-            'pity4' => Redis::get('pity4_count_' . $sessionId) ?? 0,
-            'pity5' => Redis::get('pity5_count_' . $sessionId) ?? 0,
-            'inventory' => Redis::get('inventory_' . $sessionId) ?? 0
+            'totalPulls' => Redis::get('totalPulls_count_' . $this->sessionId) ?? 0,
+            'pity4' => Redis::get('pity4_count_' . $this->sessionId) ?? 0,
+            'pity5' => Redis::get('pity5_count_' . $this->sessionId) ?? 0,
+            'inventory' => Redis::get('inventory_' . $this->sessionId) ?? []
         ];
     }
 
@@ -172,18 +161,34 @@ class StandardBanner extends Component
         })->random();
     }
 
-    public function resetPity($rarity, $sessionId)
+    public function resetPity($rarity)
     {
         if ($rarity == $this->get5starId) {
-            Redis::setex('pity5_count_' . $sessionId, $this->cacheDuration * 60, 0);
-            Redis::setex('pity4_count_' . $sessionId, $this->cacheDuration * 60, 0);
+            Redis::setex('pity5_count_' . $this->sessionId, $this->cacheDuration * 60, 0);
+            Redis::setex('pity4_count_' . $this->sessionId, $this->cacheDuration * 60, 0);
         } elseif ($rarity == $this->get4starId) {
-            Redis::setex('pity4_count_' . $sessionId, $this->cacheDuration * 60, 0);
+            Redis::setex('pity4_count_' . $this->sessionId, $this->cacheDuration * 60, 0);
         }
     }
+
     public function resetAllRecords()
     {
-        Cache::flush();
+        $inventoryKey = 'inventory_' . $this->sessionId;
+
+        Redis::setex('pity5_count_' . $this->sessionId, $this->cacheDuration * 60, 0);
+        Redis::setex('pity4_count_' . $this->sessionId, $this->cacheDuration * 60, 0);
+        Redis::setex('totalPulls_count_' . $this->sessionId, $this->cacheDuration * 60, 0);
+        // Redis::hdel('inventory_' . $this->sessionId, 'dummy');
+        // Redis::hset('inventory_' . $this->sessionId, 'dummy', 'dummy');
+        // Redis::expire('inventory_' . $this->sessionId, $this->cacheDuration * 60);
+        // Get all fields in the hash
+        $fields = Redis::hkeys($inventoryKey);
+        // Delete all fields
+        if (!empty($fields)) {
+            Redis::hdel($inventoryKey, ...$fields);
+        }
+        $this->cachedData = $this->getCacheData();
+        $this->refreshInventory();
     }
 
     public function colorPick($rarity)
@@ -204,18 +209,17 @@ class StandardBanner extends Component
         };
     }
 
-
     public function render()
     {
         return view('livewire.standard-banner');
     }
 
-    //MODUL INVENTORY
-    private function addToInventory($gachaResult, $sessionId)
+    private function addToInventory($gachaResult)
     {
-        $key = 'inventory_' . $sessionId;
+
+        $key = 'inventory_' . $this->sessionId;
         $itemKey = 'item_' . $gachaResult->id;
-    
+
         if (Redis::hexists($key, $itemKey)) {
             $this->ownedStatus = 'yes';
             Redis::hincrby($key, $itemKey, 1);
@@ -225,11 +229,11 @@ class StandardBanner extends Component
         }
     }
 
-    private function getInventory($sessionId)
+    private function getInventory()
     {
-        $key = 'inventory_' . $sessionId;
+        $key = 'inventory_' . $this->sessionId;
         $inventory = Redis::hgetall($key);
-        
+
         if (!$inventory) {
             return [];
         }
@@ -237,4 +241,28 @@ class StandardBanner extends Component
         return $inventory;
     }
 
+    public function refreshInventory()
+    {
+        $this->inventoryItems = $this->fetchInventoryItems();
+    }
+
+    private function fetchInventoryItems()
+    {
+        $key = 'inventory_' . $this->sessionId;
+        $inventory = Redis::hgetall($key);
+
+        if (!$inventory) {
+            return [];
+        }
+
+        $itemIds = array_map(fn ($key) => intval(str_replace('item_', '', $key)), array_keys($inventory));
+
+        $items = Weapon::whereIn('id', $itemIds)->get();
+
+        foreach ($items as $item) {
+            $item->count = $inventory['item_' . $item->id] ?? 0;
+        }
+
+        return $items;
+    }
 }

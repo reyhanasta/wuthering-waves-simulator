@@ -19,10 +19,12 @@
                     <span class="sr-only">Close modal</span>
                 </button>
             </div>
+            {{dd($inventoryItems)}}
             <!-- Modal body -->
             <div class="p-4 space-y-4 md:p-5">
                 <div id="inventory" class="mt-8">
                     <div class="grid grid-cols-5 gap-4">
+
                         @foreach ($inventoryItems as $item)
                             <div class="p-4 border border-gray-300 rounded-2xl">
                                 <img src="{{ Storage::url($item->img) }}" alt="{{ $item->name }}" class="object-cover w-full h-32 rounded-lg">
