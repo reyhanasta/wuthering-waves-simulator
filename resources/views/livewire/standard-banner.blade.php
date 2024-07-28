@@ -52,8 +52,6 @@
                                                 </svg>
                                                 Inventory
                                             </button>
-
-                                            {{-- inventory display --}}
                                         </li>
                                         <li class="grid place-items-center">
                                             <button type="button" wire:click="resetAllRecords()" x-on:click="$wire.$refresh()"
