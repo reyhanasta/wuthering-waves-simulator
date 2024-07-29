@@ -6,7 +6,7 @@
             <!-- Modal header -->
             <div class="flex items-center justify-between p-4 border-b rounded-t md:p-5 dark:border-black">
                 <h3 class="text-xl font-semibold text-black">
-                    Inventory
+                    Inventory List
                 </h3>
                 <button type="button"
                     class="inline-flex items-center justify-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:bg-gray-200 hover:text-gray-900 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
@@ -44,3 +44,13 @@
     </div>
 </div>
 
+<div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="flex items-center bg-gray-100 p-4 rounded-lg">
+      <img src="{{ Storage::url($item->img) }}" alt="{{ $item->name }}" alt="Item" class="w-12 h-12 mr-4 rounded-full">
+      <div>
+        <p class="text-sm font-medium text-gray-700">{{ $item->name }}</p>
+        <p class="text-yellow-500">{{ str_repeat('★', $item->rarity) }}</p>
+      </div>
+    </div>
+    <!-- Repeat for other items -->
+</div>

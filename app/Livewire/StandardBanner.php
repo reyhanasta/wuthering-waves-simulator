@@ -6,6 +6,7 @@ use Log;
 use App\Models\Rarity;
 use App\Models\Weapon;
 use Livewire\Component;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Session;
@@ -42,15 +43,14 @@ class StandardBanner extends Component
         $this->gachaImgBg = Storage::url('public/images/background/T_LuckdrawShare.jpg');
         $this->cachedData = $this->getCacheData();
         $this->inventory = $this->getInventory();
+        $this->refreshInventory();
     }
 
     public function singlePull()
     {
-        $this->initializeCache();
         $gachaResult = $this->getGachaResult();
         Redis::incr('totalPulls_count_' . $this->sessionId);
         $this->cachedData = $this->getCacheData();
-
         if ($gachaResult) {
             $this->bgImg = '';
             $this->displayStyle = 'grid-cols-1';
@@ -78,7 +78,6 @@ class StandardBanner extends Component
         }
         Redis::incrby('totalPulls_count_' . $this->sessionId, 10);
         $this->cachedData = $this->getCacheData();
-
         $this->gachaResults = $results;
     }
 
@@ -115,20 +114,20 @@ class StandardBanner extends Component
         return null;
     }
 
-    private function initializeCache()
-    {
-        $this->cacheWithDefault('totalPulls_count_' . $this->sessionId, 0);
-        $this->cacheWithDefault('pity4_count_' . $this->sessionId, 0);
-        $this->cacheWithDefault('pity5_count_' . $this->sessionId, 0);
-        $this->cacheWithDefault('inventory_' . $this->sessionId, []);
-    }
+    // private function initializeCache()
+    // {
+    //     $this->cacheWithDefault('totalPulls_count_' . $this->sessionId, 0);
+    //     $this->cacheWithDefault('pity4_count_' . $this->sessionId, 0);
+    //     $this->cacheWithDefault('pity5_count_' . $this->sessionId, 0);
+    //     $this->cacheWithDefault('inventory_' . $this->sessionId, []);
+    // }
 
-    private function cacheWithDefault($key, $default)
-    {
-        if (!Redis::exists($key)) {
-            Redis::setex($key, $this->cacheDuration * 60, $default);
-        }
-    }
+    // private function cacheWithDefault($key, $default)
+    // {
+    //     if (!Redis::exists($key)) {
+    //         Redis::setex($key, $this->cacheDuration * 60, $default);
+    //     }
+    // }
 
     private function getCacheData()
     {
@@ -161,6 +160,23 @@ class StandardBanner extends Component
         })->random();
     }
 
+    // private function getRandomWeaponByRarity($rarity)
+    // {
+    //     // Cache untuk daftar ID item berdasarkan rarity
+    //     $itemIds = Cache::remember("weapon_ids_rarity_{$rarity}", $this->cacheDuration * 60, function () use ($rarity) {
+    //         return Weapon::where('rarity', $rarity)->pluck('id')->toArray();
+    //     });
+
+
+    //     // Pilih satu ID secara acak dari daftar ID yang di-cache
+    //     $randomItemId = Arr::random($itemIds);
+
+    //     // Cache per item berdasarkan ID
+    //     return Cache::remember("weapon_{$randomItemId}", $this->cacheDuration * 60, function () use ($randomItemId) {
+    //         return Weapon::find($randomItemId);
+    //     });
+    // }
+
     public function resetPity($rarity)
     {
         if ($rarity == $this->get5starId) {
@@ -187,6 +203,7 @@ class StandardBanner extends Component
         if (!empty($fields)) {
             Redis::hdel($inventoryKey, ...$fields);
         }
+        Cache::flush();
         $this->cachedData = $this->getCacheData();
         $this->refreshInventory();
     }

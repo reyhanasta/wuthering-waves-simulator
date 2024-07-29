@@ -19,7 +19,6 @@
                     <span class="sr-only">Close modal</span>
                 </button>
             </div>
-            {{dd($inventoryItems)}}
             <!-- Modal body -->
             <div class="p-4 space-y-4 md:p-5">
                 <div id="inventory" class="mt-8">
