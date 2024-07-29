@@ -19,7 +19,7 @@ class WeaponTypeResource extends Resource
 {
     protected static ?string $model = WeaponType::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-adjustments-vertical';
 
     public static function form(Form $form): Form
     {
