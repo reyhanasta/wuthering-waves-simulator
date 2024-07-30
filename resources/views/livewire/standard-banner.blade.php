@@ -8,7 +8,7 @@
                         class="grid max-w-2xl gap-2 p-4 m-4 bg-gray-800 border-2 shadow-xl rounded-xl {{$displayStyle}}">
                         @foreach ($gachaResults as $item)
                         <div
-                            class="relative overflow-hidden bg-gray-700 bg-center border-2 border-solid rounded-lg shadow-lg border-slate-500">
+                            class="relative overflow-hidden bg-gray-700 bg-center border-2 border-solid rounded-lg border-slate-500">
                             {{-- Jika ada Item baru --}}
 
                             @if ($item['owned'] == 'no')
