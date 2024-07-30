@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Tables;
 use App\Models\Rarity;
 use App\Models\Weapon;
+use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
 use App\Models\WeaponType;
@@ -16,6 +17,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
@@ -39,7 +41,10 @@ class WeaponResource extends Resource
                     ->autocapitalize('words')
                     ->columnSpan(2)
                     ->live(onBlur:true)
-                    ->afterStateUpdated(function(string $state,Forms\Set $set){
+                    ->afterStateUpdated(function(Set $set,Get $get, ?string $state,?string $old){
+                        if (($get('slug') ?? '') !== Str::slug($old)) {
+                            return;
+                        }
                         $set('slug',Str::slug($state));
                     })->required(),
                 TextInput::make('slug')
@@ -71,6 +76,7 @@ class WeaponResource extends Resource
         return $table
             ->columns([
                 //
+                ImageColumn::make('img')->circular()->disk('public'),
                 TextColumn::make('name')->searchable(),
                 TextColumn::make('weaponRarity.level')->sortable()->badge()->color(fn (string $state): string => match ($state) {
                     'SSR' => 'danger',

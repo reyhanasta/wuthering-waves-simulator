@@ -2,10 +2,14 @@
 
 namespace App\Filament\Resources;
 
+use Attribute;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Rarity;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
+use Filament\Pages\Page;
 use App\Models\Character;
 use App\Models\WeaponType;
 use Filament\Tables\Table;
@@ -15,11 +19,11 @@ use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Resources\Pages\CreateRecord;
+use App\Models\Attribute as ModelsAttribute;
 use App\Filament\Resources\CharacterResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\CharacterResource\RelationManagers;
-use App\Models\Attribute as ModelsAttribute;
-use Attribute;
 
 class CharacterResource extends Resource
 {
@@ -34,31 +38,40 @@ class CharacterResource extends Resource
                 //
                 TextInput::make('name')
                 ->translateLabel()
-                    ->autocapitalize('words')
                     ->columnSpan(2)
-                    ->live(onBlur:true)
-                    ->afterStateUpdated(function(string $state,Forms\Set $set){
+                    ->live(debounce:1000)
+                    ->afterStateUpdated(function( Set $set,Get $get, ?string $state,?string $old) {
+                        if (($get('slug') ?? '') !== Str::slug($old)) {
+                            return;
+                        }
                         $set('slug',Str::slug($state));
-                    })->required(),
+                    })
+                    ->dehydrateStateUsing(fn ($state) => ucwords($state))
+                    ->required(),
                     TextInput::make('slug')
-                    ->translateLabel()
-                    ->readOnly(),
+                    ->readOnly()
+                    ->filled()
+                    ->unique()
+                    ->validationMessages([
+                        'unique' => 'The :attribute has already been registered.',
+                        'filled' => 'Harus di isi'
+                    ]),
                     Select::make('rarity')
                     ->options(Rarity::all()
                     ->pluck('level', 'id')
-                    ->toArray())->required(),
+                    ->toArray())->live()->required(),
                     Select::make('weapon')
                     ->options(WeaponType::all()
                     ->pluck('name', 'id')
                     ->map(function ($name) {
                         return ucwords($name);
-                    })->toArray())->required(),
+                    })->toArray())->live()->required(),
                     Select::make('attribute')
                     ->options(ModelsAttribute::all()
                     ->pluck('name', 'id')
                     ->map(function ($name) {
                         return ucwords($name);
-                    })->toArray())->required(),
+                    })->toArray())->live()->required(),
             ]);
     }
 
