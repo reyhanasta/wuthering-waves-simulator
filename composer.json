@@ -7,10 +7,12 @@
     "require": {
         "php": "^8.2",
         "filament/filament": "^3.2",
+        "filament/spatie-laravel-media-library-plugin": "^3.2",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.5",
-        "predis/predis": "^2.2"
+        "predis/predis": "^2.2",
+        "spatie/laravel-medialibrary": "^11.8"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.13",

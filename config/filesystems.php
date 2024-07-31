@@ -44,6 +44,14 @@ return [
             'throw' => false,
         ],
 
+        'icon' => [
+            'driver' => 'local',
+            'root'   => storage_path('app/public/icons/weapons'),
+            'url'    => env('APP_URL').'/storage/icons/weapons',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

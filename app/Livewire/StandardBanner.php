@@ -6,6 +6,7 @@ use Log;
 use App\Models\Rarity;
 use App\Models\Weapon;
 use Livewire\Component;
+use Spatie\Image\Image;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
@@ -40,7 +41,7 @@ class StandardBanner extends Component
             return Rarity::all();
         });
         $this->bgImg = Storage::url('public/images/background/gacha-banner.jpg');
-        $this->gachaImgBg = Storage::url('public/images/background/T_LuckdrawShare.jpg');
+        // $this->gachaImgBg = Storage::url('public/images/background/T_LuckdrawShare.jpg');
         $this->cachedData = $this->getCacheData();
         $this->inventory = $this->getInventory();
         $this->refreshInventory();
@@ -141,10 +142,11 @@ class StandardBanner extends Component
 
     private function formatGachaResult($gachaResult)
     {
+
         return [
             'id' => $gachaResult->id,
             'name' => $gachaResult->name,
-            'img' => Storage::url($gachaResult->img),
+            'img' => $gachaResult->getFirstMediaUrl('weapon','thumb'),
             'type' => $gachaResult->type,
             'rarity' => $gachaResult->rarity,
             'color' => $this->colorPick($gachaResult->rarity),
@@ -156,8 +158,8 @@ class StandardBanner extends Component
     private function getRandomWeaponByRarity($rarity)
     {
         return Cache::remember("weapons_rarity_{$rarity}", $this->cacheDuration * 60, function () use ($rarity) {
-            return Weapon::where('rarity', $rarity)->get();
-        })->random();
+            return Weapon::where('rarity', $rarity)->inRandomOrder()->first();
+        });
     }
 
     // private function getRandomWeaponByRarity($rarity)

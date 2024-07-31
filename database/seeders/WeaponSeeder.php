@@ -17,8 +17,8 @@ class WeaponSeeder extends Seeder
 
         $weapons = [
             [
-                'name' => 'Iron Sword',
-                'slug' => 'iron-sword',
+                'name' => 'Sword of Night',
+                'slug' => 'sword-of-night',
                 'type' => 1,
                 'rarity' => 3,
                 'img' => '/images/weapons/iron-sword.png',
@@ -27,15 +27,15 @@ class WeaponSeeder extends Seeder
             [
                 'name' => 'Marcato',
                 'slug' => 'marcato',
-                'type' => 1,
+                'type' => 2,
                 'rarity' => 2,
                 'img' => '/images/weapons/marcato.png',
                 'specifications' => 'standard'
             ],
             [
-                'name' => 'Ages of Harvest',
-                'slug' => 'ages-of-harvest',
-                'type' => 1,
+                'name' => 'Verdant Summit',
+                'slug' => 'verdant-summit',
+                'type' => 3,
                 'rarity' => 1,
                 'img' => '/images/weapons/ages-of-harvest.png',
                 'specifications' => 'limited'

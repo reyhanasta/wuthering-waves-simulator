@@ -15,7 +15,7 @@
                             <div class="absolute top-0 left-0 p-1 text-xs font-bold text-white bg-yellow-500">New</div>
                             @endif
                             <div class="relative ">
-                                <img class="object-cover w-full h-40 border-b-2" src="{{ $item['img'] }}"
+                                <img class="object-cover w-full h-40 border-b-2" loading="lazy" src="{{ $item['img'] }}"
                                     alt="{{ $item['name'] }}">
                                 <div class="absolute bottom-0 right-0">
                                     <p class="text-xl text-yellow-400">{{ str_repeat('★', $item['stars']) }}</p>
