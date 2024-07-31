@@ -43,7 +43,7 @@ class WeaponResource extends Resource
                     ->autocapitalize('words')
                     ->columnSpan(2)
                     ->dehydrateStateUsing(fn ($state) => ucwords($state))
-                    ->live(onBlur:true)
+                    ->live(debounce:1000)
                     ->afterStateUpdated(function(Set $set,Get $get, ?string $state,?string $old){
                         if (($get('slug') ?? '') !== Str::slug($old)) {
                             return;
@@ -56,12 +56,12 @@ class WeaponResource extends Resource
                 Select::make('rarity')
                     ->options(Rarity::all()
                         ->pluck('level', 'id')
-                        ->toArray())->required(),
+                        ->toArray())->live()->required(),
                 Select::make('type')
                     ->options(WeaponType::all()
                         ->pluck('name', 'id')
                         ->map(fn ($name) => ucwords($name))
-                        ->toArray())->required(),
+                        ->toArray())->live()->required(),
                 SpatieMediaLibraryFileUpload::make('img')
                 ->disk('icon')
                 ->directory('weapons')

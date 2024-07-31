@@ -17,7 +17,7 @@ class StandardBanner extends Component
 {
     public $cacheDuration = 120; // Cache duration in minutes
     public $cachedData;
-    public $resetCache;
+    
     public $gachaResults = [];
     public $inventory = [];
     public $inventoryItems = [];
@@ -33,6 +33,7 @@ class StandardBanner extends Component
 
     public $baseDropRates;
     public $weaponColor = 'cyan';
+    
 
     public function mount()
     {
@@ -94,14 +95,14 @@ class StandardBanner extends Component
 
         $increasedDropRate = ($fivestarpity >= 70) ? $fiveStarDropRates * 1.8 + (1 / 100) :  $fiveStarDropRates;
 
-        if ($fourstarpity >= 10 && $fivestarpity < 80) {
-            $this->resetPity($this->get4starId);
-            return $this->getRandomWeaponByRarity($this->get4starId);
-        }
-
         if ($fivestarpity == 80) {
             $this->resetPity($this->get5starId);
             return $this->getRandomWeaponByRarity($this->get5starId);
+        }
+
+        if ($fourstarpity >= 10 && $fivestarpity < 80) {
+            $this->resetPity($this->get4starId);
+            return $this->getRandomWeaponByRarity($this->get4starId);
         }
 
         $cumulativeProbability = 0;
@@ -115,21 +116,14 @@ class StandardBanner extends Component
         return null;
     }
 
-    // private function initializeCache()
-    // {
-    //     $this->cacheWithDefault('totalPulls_count_' . $this->sessionId, 0);
-    //     $this->cacheWithDefault('pity4_count_' . $this->sessionId, 0);
-    //     $this->cacheWithDefault('pity5_count_' . $this->sessionId, 0);
-    //     $this->cacheWithDefault('inventory_' . $this->sessionId, []);
-    // }
+    private function getRandomWeaponByRarity($rarity)
+    {
+        return Cache::remember("weapons_rarity_{$rarity}", $this->cacheDuration * 60, function () use ($rarity) {
+            return Weapon::where('rarity', $rarity)->get();
+        })->random();
+        
 
-    // private function cacheWithDefault($key, $default)
-    // {
-    //     if (!Redis::exists($key)) {
-    //         Redis::setex($key, $this->cacheDuration * 60, $default);
-    //     }
-    // }
-
+    }
     private function getCacheData()
     {
         return [
@@ -154,31 +148,6 @@ class StandardBanner extends Component
             'owned' => $this->ownedStatus,
         ];
     }
-
-    private function getRandomWeaponByRarity($rarity)
-    {
-        return Cache::remember("weapons_rarity_{$rarity}", $this->cacheDuration * 60, function () use ($rarity) {
-            return Weapon::where('rarity', $rarity)->inRandomOrder()->first();
-        });
-    }
-
-    // private function getRandomWeaponByRarity($rarity)
-    // {
-    //     // Cache untuk daftar ID item berdasarkan rarity
-    //     $itemIds = Cache::remember("weapon_ids_rarity_{$rarity}", $this->cacheDuration * 60, function () use ($rarity) {
-    //         return Weapon::where('rarity', $rarity)->pluck('id')->toArray();
-    //     });
-
-
-    //     // Pilih satu ID secara acak dari daftar ID yang di-cache
-    //     $randomItemId = Arr::random($itemIds);
-
-    //     // Cache per item berdasarkan ID
-    //     return Cache::remember("weapon_{$randomItemId}", $this->cacheDuration * 60, function () use ($randomItemId) {
-    //         return Weapon::find($randomItemId);
-    //     });
-    // }
-
     public function resetPity($rarity)
     {
         if ($rarity == $this->get5starId) {
