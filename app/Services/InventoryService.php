@@ -7,39 +7,35 @@ use App\Models\Weapon;
 
 class InventoryService
 {
-    protected $sessionId;
-
-    public function __construct($sessionId)
+    public function getInventory($sessionId)
     {
-        $this->sessionId = $sessionId;
-    }
-
-    public function getInventory()
-    {
-        $key = 'inventory_' . $this->sessionId;
+        $key = 'inventory_' . $sessionId;
         return Redis::hgetall($key) ?? [];
+        
     }
 
-    public function addToInventory($gachaResult)
+    public function addToInventory($gachaResult,$sessionId,$ownedStatus)
     {
-        $key = 'inventory_' . $this->sessionId;
+        $key = 'inventory_' . $sessionId;
         $itemKey = 'item_' . $gachaResult->id;
 
         if (Redis::hexists($key, $itemKey)) {
             Redis::hincrby($key, $itemKey, 1);
+            return 'yes';
         } else {
             Redis::hset($key, $itemKey, 1);
+            return 'no';
         }
     }
 
-    public function refreshInventory()
+    public function refreshInventory($sessionId)
     {
-        return $this->fetchInventoryItems();
+        return $this->fetchInventoryItems($sessionId);
     }
 
-    private function fetchInventoryItems()
+    private function fetchInventoryItems($sessionId)
     {
-        $key = 'inventory_' . $this->sessionId;
+        $key = 'inventory_' . $sessionId;
         $inventory = Redis::hgetall($key);
 
         if (!$inventory) {
@@ -53,7 +49,7 @@ class InventoryService
         foreach ($items as $item) {
             $item->count = $inventory['item_' . $item->id] ?? 0;
         }
-
+     
         return $items;
     }
 }

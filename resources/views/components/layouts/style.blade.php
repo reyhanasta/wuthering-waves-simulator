@@ -927,4 +927,8 @@
         color: #4a5568;
     }
 
+    #gachaResult {
+        background-image: url({{ URL::asset('uploads/background_image.png') }})
+        /* Tambahkan properti lain sesuai kebutuhan (misalnya, ukuran, posisi, dll.) */
+    }
 </style>

@@ -5,12 +5,11 @@
                 <div id="bannerArea" class="flex flex-col items-center">
                     <img id="bannerImg" class="max-w-2xl m-4 shadow-lg rounded-2xl" src="{{ $bgImg }}" alt="">
                     <div id="gachaResult"
-                        class="grid max-w-2xl gap-2 p-4 m-4 bg-gray-800 border-2 shadow-xl rounded-xl {{$displayStyle}}">
+                    class="grid max-w-2xl gap-2 p-4 m-2 bg-gray-800 border-2 shadow-xl rounded-xl {{$displayStyle}}">
                         @foreach ($gachaResults as $item)
                         <div
                             class="relative overflow-hidden bg-gray-700 bg-center border-2 border-solid rounded-lg border-slate-500">
                             {{-- Jika ada Item baru --}}
-
                             @if ($item['owned'] == 'no')
                             <div class="absolute top-0 left-0 p-1 text-xs font-bold text-white bg-yellow-500">New</div>
                             @endif
@@ -101,7 +100,7 @@
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative w-full max-w-2xl max-h-full p-4">
             <!-- Modal content -->
-            <div class="relative bg-gray-800 shadow rounded-2xl border-white">
+            <div class="relative bg-gray-800 border-white shadow rounded-2xl">
                 <!-- Modal header -->
                 <div class="flex items-center justify-between p-4 border-b rounded-t md:p-5 dark:border-black">
                     <h3 class="text-xl font-semibold text-white">
@@ -119,16 +118,19 @@
                     </button>
                 </div>
                 <!-- Modal body -->
-                <div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
+                <div class="grid grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-3 ">
                     @foreach ($inventoryItems as $item)
-                    <div class="flex items-center bg-gray-500 p-1 rounded-lg shadow-slate-200 border-yellow-300 border-2 border-solid">
-                        <img src="{{ Storage::url($item->img) }}" alt="{{ $item->name }}" alt="Item" class="w-10 mr-4 rounded-full border-slate-900">
+                    
+                    <div
+                        class="flex items-center p-1 bg-gray-500 border-2 border-yellow-300 border-solid rounded-lg shadow-slate-200">
+                        <img src="{{$item->getFirstMediaUrl('weapon','thumb') }}" alt="{{ $item->name }}" alt="Item"
+                            class="w-10 mr-4 rounded-full border-slate-900">
                         <div>
-                          <p class="text-sm font-medium text-white">{{ $item->name }}</p>
-                          <p class="text-yellow-500">{{ str_repeat('★', $item->rarity) }}</p>
-                          <p class="text-sm text-white">{{ $item->count }}x</p>
+                            <p class="text-sm font-medium text-white">{{ $item->name }}</p>
+                            <p class="text-yellow-500">{{ str_repeat('★', $item->rarity) }}</p>
+                            <p class="text-sm text-white">{{ $item->count }}x</p>
                         </div>
-                      </div>
+                    </div>
                     @endforeach
                     <!-- Repeat for other items -->
                 </div>
