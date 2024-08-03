@@ -22,14 +22,8 @@ class GachaService {
         $this->sessionId = Session::getId();
     }
 
-    public function getBaseDropRates($cacheDuration)
-    {
-        return Cache::remember('baseDropRates',$cacheDuration * 60, function () {
-            return Rarity::all();
-        });
-    }
 
-    public function getGachaResult($cacheDuration=120)
+    public function getGachaResult($baseDropRates,$cacheDuration=120)
     {
 
         $rand = mt_rand(0, 10000) / 100;
@@ -39,16 +33,15 @@ class GachaService {
         $fiveStarDropRates = $baseDropRates->firstWhere('level', 'SSR')->drop_rates;
         $fiveStarId = $baseDropRates->firstWhere('level', 'SSR')->id;
         $fourStarId = $baseDropRates->firstWhere('level', 'SSR')->id;
-
         $increasedDropRate = ($fiveStarPity >= 70) ? $fiveStarDropRates * 1.8 + (1 / 100) : $fiveStarDropRates;
 
         if ($fiveStarPity == 80) {
-            $this->resetPity($rarity=null,$fiveStarId,$fourStarId,$cacheDuration);
+            $this->resetPity($rarity=$fiveStarId,$fiveStarId,$fourStarId,$cacheDuration);
             return $this->getRandomWeaponByRarity($fiveStarId,$cacheDuration);
         }
 
         if ($fourStarPity >= 10 && $fiveStarPity < 80) {
-            $this->resetPity($rarity=null,$fiveStarId,$fourStarId,$cacheDuration);
+            $this->resetPity($rarity=$fourStarId,$fiveStarId,$fourStarId,$cacheDuration);
             return $this->getRandomWeaponByRarity($fourStarId,$cacheDuration);
         }
 
@@ -64,8 +57,10 @@ class GachaService {
         return null;
     }
 
+    //RESET PITTY MASIH ERROR
     public function resetPity($rarityId,$fiveStarId,$fourStarId,$cacheDuration)
     {
+
         if ($rarityId == $fiveStarId) {
             Redis::setex('pity5_count_' . $this->sessionId, $cacheDuration * 60, 0);
             Redis::setex('pity4_count_' . $this->sessionId, $cacheDuration * 60, 0);

@@ -42,10 +42,10 @@ class StandardBanner extends Component
     protected $inventoryService;
 
 
-    public function mount(CacheService $cacheService,GachaService $gachaService,InventoryService $inventoryService)
+    public function mount(CacheService $cacheService,InventoryService $inventoryService)
     {
         $this->sessionId = Session::getId();
-        $this->baseDropRates = $gachaService->getBaseDropRates($this->cacheDuration);
+        $this->baseDropRates = $this->getBaseDropRates($this->cacheDuration);
 
         $this->bgImg = Storage::url('public/images/background/gacha-banner.jpg');
         $this->gachaBg = Storage::url('public/images/background/T_LuckdrawShare.png');
@@ -57,8 +57,15 @@ class StandardBanner extends Component
 
     }
 
+    public function getBaseDropRates($cacheDuration)
+    {
+        return Cache::remember('baseDropRates',$cacheDuration * 60, function () {
+            return Rarity::all();
+        });
+    }
+
     public function singlePull(CacheService $cacheService,InventoryService $inventoryService,GachaService $gachaService){
-        $gachaResult = $gachaService->getGachaResult($this->cacheDuration);
+        $gachaResult = $gachaService->getGachaResult($this->baseDropRates,$this->cacheDuration);
         Redis::incr('totalPulls_count_' . $this->sessionId);
         if ($gachaResult) {
             $this->bgImg = '';
@@ -75,7 +82,7 @@ class StandardBanner extends Component
     public function tenPulls(CacheService $cacheService,InventoryService $inventoryService,GachaService $gachaService){
         $results = [];
         for ($i = 0; $i < 10; $i++) {
-            $gachaResult = $gachaService->getGachaResult($this->cacheDuration);
+            $gachaResult = $gachaService->getGachaResult($this->baseDropRates,$this->cacheDuration);
             $this->weaponColor = $this->colorPick($gachaResult->rarity);
             if ($gachaResult) {
                 $this->bgImg = '';
@@ -90,37 +97,37 @@ class StandardBanner extends Component
         $this->gachaResults = $results;
     }
 
-    private function getGachaResult($gachaService){
-        $rand = mt_rand(0, 10000) / 100;
-        $fourstarpity = Redis::incr('pity4_count_' . $this->sessionId);
-        $fivestarpity = Redis::incr('pity5_count_' . $this->sessionId);
+    // private function getGachaResult($gachaService){
+    //     $rand = mt_rand(0, 10000) / 100;
+    //     $fourstarpity = Redis::incr('pity4_count_' . $this->sessionId);
+    //     $fivestarpity = Redis::incr('pity5_count_' . $this->sessionId);
 
-        $fiveStarDropRates = $this->baseDropRates->firstWhere('level', 'SSR')->drop_rates;
-        $this->get5starId = $this->baseDropRates->firstWhere('level', 'SSR')->id;
-        $this->get4starId = $this->baseDropRates->firstWhere('level', 'SR')->id;
+    //     $fiveStarDropRates = $this->baseDropRates->firstWhere('level', 'SSR')->drop_rates;
+    //     $this->get5starId = $this->baseDropRates->firstWhere('level', 'SSR')->id;
+    //     $this->get4starId = $this->baseDropRates->firstWhere('level', 'SR')->id;
 
-        $increasedDropRate = ($fivestarpity >= 70) ? $fiveStarDropRates * 1.8 + (1 / 100) :  $fiveStarDropRates;
+    //     $increasedDropRate = ($fivestarpity >= 70) ? $fiveStarDropRates * 1.8 + (1 / 100) :  $fiveStarDropRates;
 
-        if ($fivestarpity == 80) {
-            $this->resetPity($this->get5starId);
-            return $gachaService->getRandomWeaponByRarity($this->get5starId,$this->cacheDuration);
-        }
+    //     if ($fivestarpity == 80) {
+    //         $this->resetPity($this->get5starId);
+    //         return $gachaService->getRandomWeaponByRarity($this->get5starId,$this->cacheDuration);
+    //     }
 
-        if ($fourstarpity >= 10 && $fivestarpity < 80) {
-            $this->resetPity($this->get4starId);
-            return $gachaService->getRandomWeaponByRarity($this->get4starId,$this->cacheDuration);
-        }
+    //     if ($fourstarpity >= 10 && $fivestarpity < 80) {
+    //         $this->resetPity($this->get4starId);
+    //         return $gachaService->getRandomWeaponByRarity($this->get4starId,$this->cacheDuration);
+    //     }
 
-        $cumulativeProbability = 0;
-        foreach ($this->baseDropRates as $rates) {
-            $cumulativeProbability += ($rates->level == 'SSR') ? $increasedDropRate : $rates->drop_rates;
-            if ($rand <= $cumulativeProbability) {
-                $this->resetPity($rates->id);
-                return $gachaService->getRandomWeaponByRarity($rates->id,$this->cacheDuration);
-            }
-        }
-        return null;
-    }
+    //     $cumulativeProbability = 0;
+    //     foreach ($this->baseDropRates as $rates) {
+    //         $cumulativeProbability += ($rates->level == 'SSR') ? $increasedDropRate : $rates->drop_rates;
+    //         if ($rand <= $cumulativeProbability) {
+    //             $this->resetPity($rates->id);
+    //             return $gachaService->getRandomWeaponByRarity($rates->id,$this->cacheDuration);
+    //         }
+    //     }
+    //     return null;
+    // }
 
     // private function getRandomWeaponByRarity($rarity){
     //     return Cache::remember("weapons_rarity_{$rarity}", $this->cacheDuration * 60, function () use ($rarity) {
