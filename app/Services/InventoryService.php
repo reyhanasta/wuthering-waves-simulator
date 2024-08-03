@@ -11,10 +11,10 @@ class InventoryService
     {
         $key = 'inventory_' . $sessionId;
         return Redis::hgetall($key) ?? [];
-        
+
     }
 
-    public function addToInventory($gachaResult,$sessionId,$ownedStatus)
+    public function addToInventory($gachaResult,$sessionId)
     {
         $key = 'inventory_' . $sessionId;
         $itemKey = 'item_' . $gachaResult->id;
@@ -49,7 +49,7 @@ class InventoryService
         foreach ($items as $item) {
             $item->count = $inventory['item_' . $item->id] ?? 0;
         }
-     
+
         return $items;
     }
 }
