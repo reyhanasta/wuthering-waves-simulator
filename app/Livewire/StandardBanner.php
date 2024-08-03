@@ -9,6 +9,7 @@ use Livewire\Component;
 use Spatie\Image\Image;
 use Illuminate\Support\Arr;
 use App\Services\CacheService;
+use App\Services\GachaService;
 use App\Services\InventoryService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
@@ -37,46 +38,44 @@ class StandardBanner extends Component
     public $baseDropRates;
     public $weaponColor = 'cyan';
 
-    protected $cacheService;
+
     protected $inventoryService;
 
 
-    public function mount(CacheService $cacheService,InventoryService $inventoryService)
+    public function mount(CacheService $cacheService,GachaService $gachaService,InventoryService $inventoryService)
     {
         $this->sessionId = Session::getId();
-        $this->cacheService = $cacheService;
-        $this->baseDropRates = $this->cacheService->getBaseDropRates($this->cacheDuration);
+        $this->baseDropRates = $gachaService->getBaseDropRates($this->cacheDuration);
+
         $this->bgImg = Storage::url('public/images/background/gacha-banner.jpg');
         $this->gachaBg = Storage::url('public/images/background/T_LuckdrawShare.png');
         // $this->gachaImgBg = Storage::url('public/images/background/T_LuckdrawShare.jpg');
-        $this->cachedData = $this->cacheService->getCacheData($this->sessionId);
+        $this->cachedData = $cacheService->getCacheData($this->sessionId);
 
         $this->inventory = $inventoryService->getInventory($this->sessionId);
         $this->inventoryItems = $inventoryService->refreshInventory($this->sessionId);
 
     }
 
-    public function singlePull(CacheService $cacheService,InventoryService $inventoryService){
-        $gachaResult = $this->getGachaResult();
-        $this->cacheService = $cacheService;
+    public function singlePull(CacheService $cacheService,InventoryService $inventoryService,GachaService $gachaService){
+        $gachaResult = $gachaService->getGachaResult($this->cacheDuration);
         Redis::incr('totalPulls_count_' . $this->sessionId);
         if ($gachaResult) {
             $this->bgImg = '';
             $this->displayStyle = 'grid-cols-1';
             $this->ownedStatus = $inventoryService->addToInventory($gachaResult,$this->sessionId);
             $this->gachaResults = [$this->formatGachaResult($gachaResult)];
-            $this->cachedData = $this->cacheService->getCacheData($this->sessionId);
+            $this->cachedData = $cacheService->getCacheData($this->sessionId);
             $this->inventoryItems = $inventoryService->refreshInventory($this->sessionId);
         } else {
             $this->gachaResults = ['errors'];
         }
     }
 
-    public function tenPulls(CacheService $cacheService,InventoryService $inventoryService){
-        $this->cacheService = $cacheService;
+    public function tenPulls(CacheService $cacheService,InventoryService $inventoryService,GachaService $gachaService){
         $results = [];
         for ($i = 0; $i < 10; $i++) {
-            $gachaResult = $this->getGachaResult();
+            $gachaResult = $gachaService->getGachaResult($this->cacheDuration);
             $this->weaponColor = $this->colorPick($gachaResult->rarity);
             if ($gachaResult) {
                 $this->bgImg = '';
@@ -87,11 +86,11 @@ class StandardBanner extends Component
             }
         }
         Redis::incrby('totalPulls_count_' . $this->sessionId, 10);
-        $this->cachedData = $this->cacheService->getCacheData($this->sessionId);
+        $this->cachedData = $cacheService->getCacheData($this->sessionId);
         $this->gachaResults = $results;
     }
 
-    private function getGachaResult(){
+    private function getGachaResult($gachaService){
         $rand = mt_rand(0, 10000) / 100;
         $fourstarpity = Redis::incr('pity4_count_' . $this->sessionId);
         $fivestarpity = Redis::incr('pity5_count_' . $this->sessionId);
@@ -104,12 +103,12 @@ class StandardBanner extends Component
 
         if ($fivestarpity == 80) {
             $this->resetPity($this->get5starId);
-            return $this->getRandomWeaponByRarity($this->get5starId);
+            return $gachaService->getRandomWeaponByRarity($this->get5starId,$this->cacheDuration);
         }
 
         if ($fourstarpity >= 10 && $fivestarpity < 80) {
             $this->resetPity($this->get4starId);
-            return $this->getRandomWeaponByRarity($this->get4starId);
+            return $gachaService->getRandomWeaponByRarity($this->get4starId,$this->cacheDuration);
         }
 
         $cumulativeProbability = 0;
@@ -117,19 +116,17 @@ class StandardBanner extends Component
             $cumulativeProbability += ($rates->level == 'SSR') ? $increasedDropRate : $rates->drop_rates;
             if ($rand <= $cumulativeProbability) {
                 $this->resetPity($rates->id);
-                return $this->getRandomWeaponByRarity($rates->id);
+                return $gachaService->getRandomWeaponByRarity($rates->id,$this->cacheDuration);
             }
         }
         return null;
     }
 
-    private function getRandomWeaponByRarity($rarity){
-        return Cache::remember("weapons_rarity_{$rarity}", $this->cacheDuration * 60, function () use ($rarity) {
-            return Weapon::where('rarity', $rarity)->get();
-        })->random();
-
-
-    }
+    // private function getRandomWeaponByRarity($rarity){
+    //     return Cache::remember("weapons_rarity_{$rarity}", $this->cacheDuration * 60, function () use ($rarity) {
+    //         return Weapon::where('rarity', $rarity)->get();
+    //     })->random();
+    // }
 
     private function formatGachaResult($gachaResult){
         return [
@@ -153,7 +150,6 @@ class StandardBanner extends Component
     }
 
     public function resetAllRecords(CacheService $cacheService,InventoryService $inventoryService){
-        $this->cacheService = $cacheService;
         $inventoryKey = 'inventory_' . $this->sessionId;
         Redis::setex('pity5_count_' . $this->sessionId, $this->cacheDuration * 60, 0);
         Redis::setex('pity4_count_' . $this->sessionId, $this->cacheDuration * 60, 0);
@@ -168,7 +164,7 @@ class StandardBanner extends Component
             Redis::hdel($inventoryKey, ...$fields);
         }
         Cache::flush();
-        $this->cachedData = $this->cacheService->getCacheData($this->sessionId);
+        $this->cachedData = $cacheService->getCacheData($this->sessionId);
         $this->inventoryItems = $inventoryService->refreshInventory($this->sessionId);
     }
 
