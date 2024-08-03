@@ -32,7 +32,7 @@ class GachaService {
 
         $fiveStarDropRates = $baseDropRates->firstWhere('level', 'SSR')->drop_rates;
         $fiveStarId = $baseDropRates->firstWhere('level', 'SSR')->id;
-        $fourStarId = $baseDropRates->firstWhere('level', 'SSR')->id;
+        $fourStarId = $baseDropRates->firstWhere('level', 'SR')->id;
         $increasedDropRate = ($fiveStarPity >= 70) ? $fiveStarDropRates * 1.8 + (1 / 100) : $fiveStarDropRates;
 
         if ($fiveStarPity == 80) {
@@ -49,7 +49,7 @@ class GachaService {
         foreach ($baseDropRates as $rates) {
             $cumulativeProbability += ($rates->level == 'SSR') ? $increasedDropRate : $rates->drop_rates;
             if ($rand <= $cumulativeProbability) {
-                $this->resetPity($rates->id,$fiveStarId,$fourStarId,$cacheDuration,$this->sessionId);
+                $this->resetPity($rates->id,$fiveStarId,$fourStarId,$cacheDuration);
                 return $this->getRandomWeaponByRarity($rates->id,$cacheDuration);
             }
         }

@@ -3,9 +3,9 @@
         <div id="gachaContainer" class="flex flex-col items-center justify-center gap-3 lg:grid-cols-1">
             <div class="flex flex-col items-center justify-center gap-3">
                 <div id="bannerArea" class="flex flex-col items-center">
-                    <img id="bannerImg" class="max-w-2xl m-4 shadow-lg rounded-2xl" src="{{ $bgImg }}" alt="">
+                    @if ($gachaResults)
                     <div id="gachaResult"
-                    class="grid max-w-2xl gap-2 p-4 m-2 bg-gray-800 border-2 shadow-xl rounded-xl {{$displayStyle}}">
+                        class="grid max-w-2xl gap-2 p-4 m-2 bg-gray-800 border-2 shadow-xl rounded-xl {{$displayStyle}}">
                         @foreach ($gachaResults as $item)
                         <div
                             class="relative overflow-hidden bg-gray-700 bg-center border-2 border-solid rounded-lg border-slate-500">
@@ -26,6 +26,10 @@
                         </div>
                         @endforeach
                     </div>
+                    @else
+                    <img id="bannerImg" class="max-w-2xl m-4 shadow-lg rounded-2xl" src="{{ $bgImg }}" alt="">
+                    @endif
+
                     <div id="statusArea" class="flex w-full font-semibold text-white">
                         <div class="grid w-full grid-cols-2">
                             <div id="pullStatus" class="justify-start">
@@ -40,8 +44,8 @@
                                 <div id="nav-bar" class="flex justify-between mt-2">
                                     <ul class="grid grid-cols-3 gap-4">
                                         <li class="grid m-2 place-items-center">
-                                            <button type="button" data-modal-target="large-modal"
-                                                data-modal-toggle="large-modal"
+                                            <button type="button" data-modal-target="inventory-modal"
+                                                data-modal-toggle="inventory-modal"
                                                 class="flex items-center text-sm hover:text-blue-500"
                                                 aria-label="Inventory">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -68,7 +72,9 @@
                                             </button>
                                         </li>
                                         <li class="grid place-items-center">
-                                            <button type="button" class="flex items-center text-sm hover:text-blue-500"
+                                            <button type="button" data-modal-target="detail-note-modal"
+                                                data-modal-toggle="detail-note-modal"
+                                                class="flex items-center text-sm hover:text-blue-500"
                                                 aria-label="Detail">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                     stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -96,7 +102,7 @@
         </div>
     </div>
     <!-- Large Modal -->
-    <div id="large-modal" tabindex="-1" aria-hidden="true"
+    <div id="inventory-modal" tabindex="-1" aria-hidden="true"
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative w-full max-w-2xl max-h-full p-4">
             <!-- Modal content -->
@@ -108,7 +114,7 @@
                     </h3>
                     <button type="button"
                         class="inline-flex items-center justify-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:bg-gray-200 hover:text-gray-900 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
-                        data-modal-hide="large-modal">
+                        data-modal-hide="inventory-modal">
                         <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 14 14">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -118,9 +124,9 @@
                     </button>
                 </div>
                 <!-- Modal body -->
+                @if ($inventoryItems)
                 <div class="grid grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-3 ">
                     @foreach ($inventoryItems as $item)
-                    
                     <div
                         class="flex items-center p-1 bg-gray-500 border-2 border-yellow-300 border-solid rounded-lg shadow-slate-200">
                         <img src="{{$item->getFirstMediaUrl('weapon','thumb') }}" alt="{{ $item->name }}" alt="Item"
@@ -134,9 +140,62 @@
                     @endforeach
                     <!-- Repeat for other items -->
                 </div>
+                @else
+                <div class="relative gap-6 p-4 text-center item-center">
+
+                    <span>none</span>
+
+                </div>
+                @endif
+
                 <!-- Modal footer -->
                 <div class="flex items-center p-4 border-t border-gray-200 rounded-b md:p-5 dark:black">
-                    <button data-modal-hide="large-modal" type="button"
+                    <button data-modal-hide="inventory-modal" type="button"
+                        class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900  focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-blue-100 hover:text-black focus:z-10 focus:ring-4 focus:ring-gray-10">Close
+                        It</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Large Modal -->
+    <div id="detail-note-modal" tabindex="-1" aria-hidden="true"
+        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative w-full max-w-2xl max-h-full p-4">
+            <!-- Modal content -->
+            <div class="relative bg-gray-800 border-white shadow rounded-2xl">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 border-b rounded-t md:p-5 dark:border-black">
+                    <h3 class="text-xl font-semibold text-white">
+                        Rate Details
+                    </h3>
+                    <button type="button"
+                        class="inline-flex items-center justify-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:bg-gray-200 hover:text-gray-900 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
+                        data-modal-hide="detail-note-modal">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                        <span class="sr-only">Close modal</span>
+                    </button>
+                </div>
+                <div class="relative p-7">
+                    <span><b> <u>Information about Novice Convene:</u></b></span>
+                    <p>
+                        <ul>
+                            <li>The rate for pulling a 5★ Resonator from this banner is currently set at <u>0.8%.</u> </li>
+                            <li>The rate for pulling a 4★ Resonator or Weapon from this banner is currently set at <u>6.0%.</u>.</li>
+                        </ul>
+                        No Resonators or Weapons have an increased rate on this Convene.
+                        You can only use Lustrous Tides on this banner (basic summon ticket).
+
+                        You can only obtain one of the below 5★ Resonators from the Novice Convene: Verina, Encore,
+                        Calcharo, Lingyang & Jianxin.
+                    </p>
+                </div>
+                <!-- Modal footer -->
+                <div class="flex items-center p-4 border-t border-gray-200 rounded-b md:p-5 dark:black">
+                    <button data-modal-hide="detail-note-modal" type="button"
                         class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900  focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-blue-100 hover:text-black focus:z-10 focus:ring-4 focus:ring-gray-10">Close
                         It</button>
                 </div>
