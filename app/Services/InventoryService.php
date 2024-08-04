@@ -10,22 +10,26 @@ class InventoryService
     public function getInventory($sessionId)
     {
         $key = 'inventory_' . $sessionId;
-        return Redis::hgetall($key) ?? [];
-
+        return Redis::hgetall($key);
     }
 
-    public function addToInventory($gachaResult,$sessionId)
+    public function addToInventory($gachaResult, $sessionId)
     {
         $key = 'inventory_' . $sessionId;
         $itemKey = 'item_' . $gachaResult->id;
 
-        if (Redis::hexists($key, $itemKey)) {
-            Redis::hincrby($key, $itemKey, 1);
-            return 'yes';
-        } else {
-            Redis::hset($key, $itemKey, 1);
-            return 'no';
-        }
+        $exists = Redis::hexists($key, $itemKey);
+
+        // Using pipeline to reduce the number of Redis connections
+        Redis::pipeline(function ($pipe) use ($key, $itemKey, $exists) {
+            if ($exists) {
+                $pipe->hincrby($key, $itemKey, 1);
+            } else {
+                $pipe->hset($key, $itemKey, 1);
+            }
+        });
+
+        return $exists ? 'yes' : 'no';
     }
 
     public function refreshInventory($sessionId)
@@ -38,7 +42,7 @@ class InventoryService
         $key = 'inventory_' . $sessionId;
         $inventory = Redis::hgetall($key);
 
-        if (!$inventory) {
+        if (empty($inventory)) {
             return [];
         }
 
@@ -46,6 +50,7 @@ class InventoryService
 
         $items = Weapon::whereIn('id', $itemIds)->get();
 
+        // Adding counts to the items
         foreach ($items as $item) {
             $item->count = $inventory['item_' . $item->id] ?? 0;
         }

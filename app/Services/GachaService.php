@@ -9,67 +9,60 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Session;
 
 class GachaService {
-
-    protected $fiveStarDropRates;
-    protected $fourStarDropRates;
-    protected $fiveStarId;
-    protected $fourStarId;
-    protected $sessionId;
-    protected $baseDropRates;
-
-    public function __construct()
+    public function getGachaResult($baseDropRates, $cacheDuration = 120, $sessionId)
     {
-        $this->sessionId = Session::getId();
-    }
-
-
-    public function getGachaResult($baseDropRates,$cacheDuration=120)
-    {
-
         $rand = mt_rand(0, 10000) / 100;
-        $fourStarPity = Redis::incr('pity4_count_' . $this->sessionId);
-        $fiveStarPity = Redis::incr('pity5_count_' . $this->sessionId);
 
-        $fiveStarDropRates = $baseDropRates->firstWhere('level', 'SSR')->drop_rates;
-        $fiveStarId = $baseDropRates->firstWhere('level', 'SSR')->id;
-        $fourStarId = $baseDropRates->firstWhere('level', 'SR')->id;
-        $increasedDropRate = ($fiveStarPity >= 70) ? $fiveStarDropRates * 1.8 + (1 / 100) : $fiveStarDropRates;
+        // Using pipeline to increment both pity counters in a single connection
+        list($fourStarPity, $fiveStarPity) = Redis::pipeline(function ($pipe) use ($sessionId) {
+            $pipe->incr('pity4_count_' . $sessionId);
+            $pipe->incr('pity5_count_' . $sessionId);
+        });
+
+        $fiveStar = $baseDropRates->firstWhere('level', 'SSR');
+        $fourStar = $baseDropRates->firstWhere('level', 'SR');
+        $fiveStarDropRates = $fiveStar->drop_rates;
+        $increasedDropRate = ($fiveStarPity >= 70) ? $fiveStarDropRates * 1.8 + 0.01 : $fiveStarDropRates;
 
         if ($fiveStarPity == 80) {
-            $this->resetPity($rarity=$fiveStarId,$fiveStarId,$fourStarId,$cacheDuration);
-            return $this->getRandomWeaponByRarity($fiveStarId,$cacheDuration);
+            return $this->awardWeaponAndResetPity($fiveStar->id, $fiveStar->id, $fourStar->id, $cacheDuration, $sessionId);
         }
 
         if ($fourStarPity >= 10 && $fiveStarPity < 80) {
-            $this->resetPity($rarity=$fourStarId,$fiveStarId,$fourStarId,$cacheDuration);
-            return $this->getRandomWeaponByRarity($fourStarId,$cacheDuration);
+            return $this->awardWeaponAndResetPity($fourStar->id, $fiveStar->id, $fourStar->id, $cacheDuration, $sessionId);
         }
 
         $cumulativeProbability = 0;
         foreach ($baseDropRates as $rates) {
-            $cumulativeProbability += ($rates->level == 'SSR') ? $increasedDropRate : $rates->drop_rates;
+            $dropRate = ($rates->level == 'SSR') ? $increasedDropRate : $rates->drop_rates;
+            $cumulativeProbability += $dropRate;
             if ($rand <= $cumulativeProbability) {
-                $this->resetPity($rates->id,$fiveStarId,$fourStarId,$cacheDuration);
-                return $this->getRandomWeaponByRarity($rates->id,$cacheDuration);
+                return $this->awardWeaponAndResetPity($rates->id, $fiveStar->id, $fourStar->id, $cacheDuration, $sessionId);
             }
         }
 
         return null;
     }
 
-    //RESET PITTY MASIH ERROR
-    public function resetPity($rarityId,$fiveStarId,$fourStarId,$cacheDuration)
+    private function awardWeaponAndResetPity($rarityId, $fiveStarId, $fourStarId, $cacheDuration, $sessionId)
     {
-
-        if ($rarityId == $fiveStarId) {
-            Redis::setex('pity5_count_' . $this->sessionId, $cacheDuration * 60, 0);
-            Redis::setex('pity4_count_' . $this->sessionId, $cacheDuration * 60, 0);
-        } elseif ($rarityId == $fourStarId) {
-            Redis::setex('pity4_count_' . $this->sessionId, $cacheDuration * 60, 0);
-        }
+        $this->resetPity($rarityId, $fiveStarId, $fourStarId, $cacheDuration, $sessionId);
+        return $this->getRandomWeaponByRarity($rarityId, $cacheDuration);
     }
 
-    public function getRandomWeaponByRarity($rarity,$cacheDuration)
+    private function resetPity($rarityId, $fiveStarId, $fourStarId, $cacheDuration, $sessionId)
+    {
+        $pipeline = Redis::pipeline();
+        if ($rarityId == $fiveStarId) {
+            $pipeline->setex('pity5_count_' . $sessionId, $cacheDuration * 60, 0);
+        }
+        if ($rarityId == $fiveStarId || $rarityId == $fourStarId) {
+            $pipeline->setex('pity4_count_' . $sessionId, $cacheDuration * 60, 0);
+        }
+        $pipeline->exec();
+    }
+
+    public function getRandomWeaponByRarity($rarity, $cacheDuration)
     {
         return Cache::remember("weapons_rarity_{$rarity}", $cacheDuration * 60, function () use ($rarity) {
             return Weapon::where('rarity', $rarity)->get();

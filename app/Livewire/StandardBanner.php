@@ -46,7 +46,7 @@ class StandardBanner extends Component
         $this->baseDropRates = $this->getBaseDropRates($this->cacheDuration);
 
         $this->bgImg = Storage::url('public/images/background/gacha-banner.jpg');
-        $this->gachaBg = Storage::url('public/images/background/T_LuckdrawShare.png');
+        // $this->gachaBg = Storage::url('public/images/background/T_LuckdrawShare.png');
         $this->cachedData = $cacheService->getCacheData($this->sessionId);
 
         $this->inventory = $inventoryService->getInventory($this->sessionId);
@@ -59,17 +59,19 @@ class StandardBanner extends Component
     public function getBaseDropRates($cacheDuration)
     {
         return Cache::remember('baseDropRates', $cacheDuration * 60, function () {
-            return Rarity::all();
+            return Rarity::select('id', 'level')->get();
         });
     }
 
     public function singlePull(CacheService $cacheService, InventoryService $inventoryService, GachaService $gachaService)
     {
         $this->displayStyle = 'grid-cols-1';
-        $gachaResult = $gachaService->getGachaResult($this->baseDropRates, $this->cacheDuration);
+        $gachaResult = $gachaService->getGachaResult($this->baseDropRates, $this->cacheDuration, $this->sessionId);
         Redis::incr('totalPulls_count_' . $this->sessionId);
+
         if ($gachaResult) {
-            $this->updateGachaDisplay($gachaResult, $inventoryService, $cacheService);
+            $this->processGachaResults([$gachaResult], $inventoryService);
+            $this->cachedData = $cacheService->getCacheData($this->sessionId);
         } else {
             $this->gachaResults = ['errors'];
         }
@@ -77,27 +79,35 @@ class StandardBanner extends Component
 
     public function tenPulls(CacheService $cacheService, InventoryService $inventoryService, GachaService $gachaService)
     {
-        $results = [];
         $this->displayStyle = 'grid-cols-5';
+        $results = [];
+
         for ($i = 0; $i < 10; $i++) {
-            $gachaResult = $gachaService->getGachaResult($this->baseDropRates, $this->cacheDuration);
+            $gachaResult = $gachaService->getGachaResult($this->baseDropRates, $this->cacheDuration, $this->sessionId);
             if ($gachaResult) {
-                $results[] = $this->formatGachaResult($gachaResult,$inventoryService);
-                $this->inventoryItems = $inventoryService->refreshInventory($this->sessionId);
+                $results[] = $gachaResult;
             }
         }
+
         Redis::incrby('totalPulls_count_' . $this->sessionId, 10);
+        $this->processGachaResults($results, $inventoryService);
         $this->cachedData = $cacheService->getCacheData($this->sessionId);
-        $this->gachaResults = $results;
     }
 
-    private function updateGachaDisplay($gachaResult, InventoryService $inventoryService, CacheService $cacheService)
+    private function processGachaResults(array $gachaResults, InventoryService $inventoryService)
     {
-        $this->gachaResults = [$this->formatGachaResult($gachaResult,$inventoryService)];
-        $this->inventoryItems = $inventoryService->refreshInventory($this->sessionId);
+        if (!empty($gachaResults)) {
+            $this->gachaResults = array_map(function($gachaResult) use ($inventoryService) {
+                return $this->formatGachaResult($gachaResult, $inventoryService);
+            }, $gachaResults);
+
+            $this->inventoryItems = $inventoryService->refreshInventory($this->sessionId);
+        } else {
+            $this->gachaResults = ['errors'];
+        }
     }
 
-    private function formatGachaResult($gachaResult,$inventoryService)
+    private function formatGachaResult($gachaResult, InventoryService $inventoryService)
     {
         return [
             'id' => $gachaResult->id,
@@ -132,6 +142,7 @@ class StandardBanner extends Component
         if (!empty($fields)) {
             Redis::hdel($inventoryKey, ...$fields);
         }
+
         Cache::flush();
         $this->cachedData = $cacheService->getCacheData($this->sessionId);
         $this->inventoryItems = $inventoryService->refreshInventory($this->sessionId);
