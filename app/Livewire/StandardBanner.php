@@ -6,7 +6,6 @@ use Log;
 use App\Models\Rarity;
 use App\Models\Weapon;
 use Livewire\Component;
-use Spatie\Image\Image;
 use Illuminate\Support\Arr;
 use App\Services\CacheService;
 use App\Services\GachaService;
@@ -47,7 +46,6 @@ class StandardBanner extends Component
         $this->baseDropRates = $this->getBaseDropRates($this->cacheDuration);
 
         $this->bgImg = Storage::url('public/images/background/gacha-banner.jpg');
-        // $this->gachaBg = Storage::url('public/images/background/T_LuckdrawShare.png');
         $this->cachedData = $cacheService->getCacheData($this->sessionId);
 
         $this->inventory = $inventoryService->getInventory($this->sessionId);
@@ -66,8 +64,9 @@ class StandardBanner extends Component
 
     public function singlePull(CacheService $cacheService, InventoryService $inventoryService, GachaService $gachaService)
     {
-        // $this->displayStyle = 'grid-cols-1';
-        $this->dispatch('loading', isLoading: true);
+        // Debugging statement
+        \Log::info('Starting single pull...');
+        $this->dispatch('loading', ['isLoading' => true]);
         $gachaResult = $gachaService->getGachaResult($this->baseDropRates, $this->cacheDuration, $this->sessionId);
         Redis::incr('totalPulls_count_' . $this->sessionId);
 
@@ -75,15 +74,19 @@ class StandardBanner extends Component
             $this->processGachaResults([$gachaResult], $inventoryService);
             $this->cachedData = $cacheService->getCacheData($this->sessionId);
             $this->displayStyle = 'grid-cols-1';
-            $this->dispatch('loading', isLoading: false);
+            $this->dispatch('loading', ['isLoading' => false]);
         } else {
             $this->gachaResults = ['errors'];
+            $this->dispatch('loading', ['isLoading' => false]);
         }
+        \Log::info('Single pull completed.');
     }
 
     public function tenPulls(CacheService $cacheService, InventoryService $inventoryService, GachaService $gachaService)
     {
-        $this->dispatch('loading', isLoading: true);
+        // Debugging statement
+        \Log::info('Starting ten pulls...');
+        $this->dispatch('loading', ['isLoading' => true]);
         $this->displayStyle = 'grid-cols-5';
         $results = [];
 
@@ -97,7 +100,8 @@ class StandardBanner extends Component
         Redis::incrby('totalPulls_count_' . $this->sessionId, 10);
         $this->processGachaResults($results, $inventoryService);
         $this->cachedData = $cacheService->getCacheData($this->sessionId);
-        $this->dispatch('loading', isLoading: false);
+        $this->dispatch('loading', ['isLoading' => false]);
+        \Log::info('Ten pulls completed.');
     }
 
     private function processGachaResults(array $gachaResults, InventoryService $inventoryService)

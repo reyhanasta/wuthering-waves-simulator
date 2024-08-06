@@ -13,13 +13,15 @@
                         x-transition:leave-end="opacity-0 transform scale-90"
                         class="flex items-center justify-center w-full h-64 bg-gray-800 border-2 border-gray-700 rounded-xl">
                         <!-- ... loading SVG and text ... -->
-                        <span>hi</span>
+                        <span>Loading...</span>
                     </div>
 
                     <!-- Gacha Results -->
                     @if ($gachaResults)
-                    <div id="gachaResult" x-show="!isLoading"
-                        x-transition:enter="transition ease-out duration-300"
+                    <div id="gachaResult"
+                        {{-- wire:loading.attr="disabled"
+                                wire:loading.class="opacity-50" --}}
+                        x-show="!isLoading" x-transition:enter="transition ease-out duration-300"
                         x-transition:enter-start="opacity-0 transform scale-90"
                         x-transition:enter-end="opacity-100 transform scale-100"
                         class="grid max-w-2xl gap-2 p-4 m-2 bg-gray-800 border-2 shadow-xl rounded-xl {{$displayStyle}}">
@@ -107,13 +109,11 @@
                             <button type="button" wire:click="singlePull" wire:loading.attr="disabled"
                                 wire:loading.class="opacity-50"
                                 class="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600">
-                                <span wire:loading.remove>Gacha</span>
-                                <span wire:loading>Loading...</span>
+                                <span>Single Pull</span>
                             </button>
                             <button type="button" wire:click="tenPulls" wire:loading.attr="disabled"
                                 wire:loading.class="opacity-50"
-                                class="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600">Gacha
-                                10x</button>
+                                class="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600">10x Pulls</button>
                         </div>
                     </div>
                 </div>
