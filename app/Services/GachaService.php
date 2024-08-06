@@ -8,16 +8,18 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Session;
 
-class GachaService {
+class GachaService
+{
     public function getGachaResult($baseDropRates, $cacheDuration = 120, $sessionId)
     {
         $rand = mt_rand(0, 10000) / 100;
 
         // Using pipeline to increment both pity counters in a single connection
-        list($fourStarPity, $fiveStarPity) = Redis::pipeline(function ($pipe) use ($sessionId) {
-            $pipe->incr('pity4_count_' . $sessionId);
-            $pipe->incr('pity5_count_' . $sessionId);
-        });
+        list($fourStarPity, $fiveStarPity) =
+            Redis::multi()
+            ->incr('pity4_count_' . $sessionId)
+            ->incr('pity5_count_' . $sessionId)
+            ->exec();
 
         $fiveStar = $baseDropRates->firstWhere('level', 'SSR');
         $fourStar = $baseDropRates->firstWhere('level', 'SR');

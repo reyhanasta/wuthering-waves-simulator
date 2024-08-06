@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
+
 use Illuminate\Support\Facades\Redis;
 
-class CacheService{ 
+class CacheService{
+
+
 
     public function getCacheData($sessionId)
     {

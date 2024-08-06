@@ -34,11 +34,6 @@ class InventoryService
 
     public function refreshInventory($sessionId)
     {
-        return $this->fetchInventoryItems($sessionId);
-    }
-
-    private function fetchInventoryItems($sessionId)
-    {
         $key = 'inventory_' . $sessionId;
         $inventory = Redis::hgetall($key);
 
@@ -48,13 +43,15 @@ class InventoryService
 
         $itemIds = array_map(fn ($key) => intval(str_replace('item_', '', $key)), array_keys($inventory));
 
-        $items = Weapon::whereIn('id', $itemIds)->get();
+        $items = Weapon::whereIn('id', $itemIds)->get()->keyBy('id');
 
-        // Adding counts to the items
-        foreach ($items as $item) {
-            $item->count = $inventory['item_' . $item->id] ?? 0;
-        }
-
-        return $items;
+        return collect($inventory)->map(function ($count, $key) use ($items) {
+            $id = intval(str_replace('item_', '', $key));
+            $item = $items[$id] ?? null;
+            if ($item) {
+                $item->count = $count;
+                return $item;
+            }
+        })->filter()->values();
     }
 }

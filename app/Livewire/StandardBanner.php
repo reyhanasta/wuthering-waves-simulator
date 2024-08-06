@@ -20,6 +20,7 @@ class StandardBanner extends Component
 {
     public $cacheDuration = 120; // Cache duration in minutes
     public $cachedData;
+    public $isLoading = false;
 
     public $gachaResults = [];
     public $inventory = [];
@@ -65,13 +66,16 @@ class StandardBanner extends Component
 
     public function singlePull(CacheService $cacheService, InventoryService $inventoryService, GachaService $gachaService)
     {
-        $this->displayStyle = 'grid-cols-1';
+        // $this->displayStyle = 'grid-cols-1';
+        $this->dispatch('loading', isLoading: true);
         $gachaResult = $gachaService->getGachaResult($this->baseDropRates, $this->cacheDuration, $this->sessionId);
         Redis::incr('totalPulls_count_' . $this->sessionId);
 
         if ($gachaResult) {
             $this->processGachaResults([$gachaResult], $inventoryService);
             $this->cachedData = $cacheService->getCacheData($this->sessionId);
+            $this->displayStyle = 'grid-cols-1';
+            $this->dispatch('loading', isLoading: false);
         } else {
             $this->gachaResults = ['errors'];
         }
@@ -79,6 +83,7 @@ class StandardBanner extends Component
 
     public function tenPulls(CacheService $cacheService, InventoryService $inventoryService, GachaService $gachaService)
     {
+        $this->dispatch('loading', isLoading: true);
         $this->displayStyle = 'grid-cols-5';
         $results = [];
 
@@ -92,19 +97,16 @@ class StandardBanner extends Component
         Redis::incrby('totalPulls_count_' . $this->sessionId, 10);
         $this->processGachaResults($results, $inventoryService);
         $this->cachedData = $cacheService->getCacheData($this->sessionId);
+        $this->dispatch('loading', isLoading: false);
     }
 
     private function processGachaResults(array $gachaResults, InventoryService $inventoryService)
     {
-        if (!empty($gachaResults)) {
-            $this->gachaResults = array_map(function($gachaResult) use ($inventoryService) {
-                return $this->formatGachaResult($gachaResult, $inventoryService);
-            }, $gachaResults);
+        $this->gachaResults = collect($gachaResults)->map(function($gachaResult) use ($inventoryService) {
+            return $this->formatGachaResult($gachaResult, $inventoryService);
+        })->toArray();
 
-            $this->inventoryItems = $inventoryService->refreshInventory($this->sessionId);
-        } else {
-            $this->gachaResults = ['errors'];
-        }
+        $this->inventoryItems = $inventoryService->refreshInventory($this->sessionId);
     }
 
     private function formatGachaResult($gachaResult, InventoryService $inventoryService)
