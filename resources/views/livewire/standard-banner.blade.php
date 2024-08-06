@@ -5,7 +5,7 @@
                 <div id="bannerArea" class="flex flex-col items-center" x-data="{ isLoading: false }"
                     x-on:loading.window="isLoading = $event.detail.isLoading">
                     <!-- Loading Indicator -->
-                    <div x-show="isLoading" x-transition:enter="transition ease-out duration-300"
+                    {{-- <div x-show="isLoading"  x-transition:enter="transition ease-out duration-300"
                         x-transition:enter-start="opacity-0 transform scale-90"
                         x-transition:enter-end="opacity-100 transform scale-100"
                         x-transition:leave="transition ease-in duration-300"
@@ -14,17 +14,19 @@
                         class="flex items-center justify-center w-full h-64 bg-gray-800 border-2 border-gray-700 rounded-xl">
                         <!-- ... loading SVG and text ... -->
                         <span>Loading...</span>
-                    </div>
-
+                    </div> --}}
+                    
                     <!-- Gacha Results -->
                     @if ($gachaResults)
+                    
                     <div id="gachaResult"
-                        {{-- wire:loading.attr="disabled"
-                                wire:loading.class="opacity-50" --}}
-                        x-show="!isLoading" x-transition:enter="transition ease-out duration-300"
+                        wire:loading.attr="disabled"
+                        wire:loading.class="relative opacity-50"
+                        {{-- x-show="!isLoading" x-transition:enter="transition ease-out duration-300"
                         x-transition:enter-start="opacity-0 transform scale-90"
-                        x-transition:enter-end="opacity-100 transform scale-100"
+                        x-transition:enter-end="opacity-100 transform scale-100" --}}
                         class="grid max-w-2xl gap-2 p-4 m-2 bg-gray-800 border-2 shadow-xl rounded-xl {{$displayStyle}}">
+                        <div wire:loading class="absolute flex z-10 items-center justify-center m-0.5 loader"></div> <!-- Replace this with your loading spinner -->
                         @foreach ($gachaResults as $item)
                         <div
                             class="relative overflow-hidden bg-gray-700 bg-center border-2 border-solid rounded-lg border-slate-500">
