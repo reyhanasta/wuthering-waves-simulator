@@ -2,48 +2,34 @@
     <div class="grid gap-6 lg:grid-cols-1 lg:gap-12">
         <div id="gachaContainer" class="flex flex-col items-center justify-center gap-3 lg:grid-cols-1">
             <div class="flex flex-col items-center justify-center gap-3">
-                <div id="bannerArea" class="flex flex-col items-center" x-data="{ isLoading: false }"
-                    x-on:loading.window="isLoading = $event.detail.isLoading">
+                <div id="bannerArea" wire:loading.attr="disabled" wire:loading.class="relative opacity-50"
+                    class="flex flex-col items-center justify-center" x-data="{ isLoading: false }"
+                    x-on:loading.window="isLoading = $event.detail.isLoading" >
                     <!-- Loading Indicator -->
-                    {{-- <div x-show="isLoading"  x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 transform scale-90"
-                        x-transition:enter-end="opacity-100 transform scale-100"
-                        x-transition:leave="transition ease-in duration-300"
-                        x-transition:leave-start="opacity-100 transform scale-100"
-                        x-transition:leave-end="opacity-0 transform scale-90"
-                        class="flex items-center justify-center w-full h-64 bg-gray-800 border-2 border-gray-700 rounded-xl">
-                        <!-- ... loading SVG and text ... -->
-                        <span>Loading...</span>
-                    </div> --}}
-                    
+                    <div wire:loading.class="absolute flex z-10 items-center justify-center m-0.5 loader"></div>
                     <!-- Gacha Results -->
                     @if ($gachaResults)
-                    
                     <div id="gachaResult"
-                        wire:loading.attr="disabled"
-                        wire:loading.class="relative opacity-50"
-                        {{-- x-show="!isLoading" x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 transform scale-90"
-                        x-transition:enter-end="opacity-100 transform scale-100" --}}
-                        class="grid max-w-2xl gap-2 p-4 m-2 bg-gray-800 border-2 shadow-xl rounded-xl {{$displayStyle}}">
-                        <div wire:loading class="absolute flex z-10 items-center justify-center m-0.5 loader"></div> <!-- Replace this with your loading spinner -->
+                        class="grid max-w-2xl gap-2 py-2 px-10 m-2 border-2 shadow-xl rounded-xl {{$displayStyle}} weapon-bg h-auto max-w-full bg-cover bg-center bg-no-repeat" >
+                        <!-- Replace this with your loading spinner -->
                         @foreach ($gachaResults as $item)
                         <div
-                            class="relative overflow-hidden bg-gray-700 bg-center border-2 border-solid rounded-lg border-slate-500">
+                            class="relative overflow-hidden bg-gray-700 bg-center border-2 border-solid rounded-lg {{ $item['color'] }}">
                             @if ($item['owned'] == 'no')
-                            <div class="absolute top-0 left-0 p-1 text-xs font-bold text-white bg-yellow-500">New</div>
+                                <div class="absolute top-0 left-0 p-1 text-xs font-bold text-white bg-yellow-500">New</div>
                             @endif
-                            <div class="relative ">
-                                <img class="object-cover w-full h-40 border-b-2" loading="lazy" src="{{ $item['img'] }}"
-                                    alt="{{ $item['name'] }}">
+                            <div id="weapon" class="relative" >
+                                <img class="object-cover w-full border-b-2 max-h-36  " loading="lazy"
+                                    src="{{ $item['img'] }}" alt="{{ $item['name'] }}">
                                 <div class="absolute bottom-0 right-0">
                                     <p class="text-xl text-yellow-400">{{ str_repeat('★', $item['stars']) }}</p>
                                 </div>
                             </div>
-                            <div class="max-w-md p-2">
+                            <div class="flex items-center justify-center h-16 p-4">
                                 <p class="text-center text-white text-md">{{ $item['name'] }}</p>
                             </div>
                         </div>
+
                         @endforeach
                     </div>
                     @else
@@ -107,15 +93,17 @@
                                 </ul>
                             </div>
                         </div>
-                        <div id="pullsArea" class="grid items-center justify-end grid-cols-2 gap-5">
+                        <div id="pullsArea" class="grid items-center justify-end grid-cols-2 gap-5" >
                             <button type="button" wire:click="singlePull" wire:loading.attr="disabled"
                                 wire:loading.class="opacity-50"
-                                class="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600">
+                                class="px-4 py-2 text-black bg-white rounded-md hover:bg-blue-600 hover:text-white">
                                 <span>Single Pull</span>
                             </button>
                             <button type="button" wire:click="tenPulls" wire:loading.attr="disabled"
                                 wire:loading.class="opacity-50"
-                                class="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600">10x Pulls</button>
+                                class="px-4 py-2 text-black bg-white rounded-md hover:bg-blue-600 hover:text-white">10x
+                                Pulls
+                            </button>
                         </div>
                     </div>
                 </div>

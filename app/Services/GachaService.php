@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\Rarity;
+
 use App\Models\Weapon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Session;
+
 
 class GachaService
 {

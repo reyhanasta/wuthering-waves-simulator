@@ -4,9 +4,7 @@ namespace App\Livewire;
 
 use Log;
 use App\Models\Rarity;
-use App\Models\Weapon;
 use Livewire\Component;
-use Illuminate\Support\Arr;
 use App\Services\CacheService;
 use App\Services\GachaService;
 use App\Services\InventoryService;
@@ -28,6 +26,7 @@ class StandardBanner extends Component
     public $displayStyle = 'hidden';
     public $sessionId;
     public $bgImg;
+    public $weaponImg;
     public $gachaBg;
     public $ownedStatus = "no";
     public $gachaImgBg;
@@ -36,7 +35,7 @@ class StandardBanner extends Component
     public $get4starId;
 
     public $baseDropRates;
-    public $weaponColor = 'cyan';
+    public $weaponColor = 'bg-cyan-400';
 
     protected $inventoryService;
 
@@ -46,6 +45,7 @@ class StandardBanner extends Component
         $this->baseDropRates = $this->getBaseDropRates($this->cacheDuration);
 
         $this->bgImg = Storage::url('public/images/background/gacha-banner.jpg');
+        $this->weaponImg = Storage::url('public/images/background/T_LuckdrawShare.png');
         $this->cachedData = $cacheService->getCacheData($this->sessionId);
 
         $this->inventory = $inventoryService->getInventory($this->sessionId);
@@ -67,7 +67,8 @@ class StandardBanner extends Component
         // Debugging statement
         \Log::info('Starting single pull...');
         $this->dispatch('loading', ['isLoading' => true]);
-     
+
+
         $gachaResult = $gachaService->getGachaResult($this->baseDropRates, $this->cacheDuration, $this->sessionId);
         Redis::incr('totalPulls_count_' . $this->sessionId);
 
@@ -88,8 +89,8 @@ class StandardBanner extends Component
         // Debugging statement
         \Log::info('Starting ten pulls...');
         // $this->dispatch('loading', ['isLoading' => true]);
-        
-        
+
+
         $results = [];
 
         for ($i = 0; $i < 10; $i++) {
@@ -153,15 +154,16 @@ class StandardBanner extends Component
 
         Cache::flush();
         $this->cachedData = $cacheService->getCacheData($this->sessionId);
+        $this->gachaResults = [];
         $this->inventoryItems = $inventoryService->refreshInventory($this->sessionId);
     }
 
     public function colorPick($rarity)
     {
         return match ($rarity) {
-            $this->get5starId => 'bg-yellow-400',
-            $this->get4starId => 'bg-purple-500',
-            default => 'bg-slate-800',
+            $this->get5starId => 'border-yellow-200',
+            $this->get4starId => 'border-purple-600',
+            default => 'border-slate-200',
         };
     }
 
