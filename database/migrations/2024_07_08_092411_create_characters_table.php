@@ -23,7 +23,7 @@ return new class extends Migration
             $table->timestamps();
 
 
-            $table->foreign('attribute')->references('id')->on('attributes');
+            $table->foreign('attribute')->references('id')->on('character_attributes');
             $table->foreign('weapon')->references('id')->on('weapon_types');
             $table->foreign('rarity')->references('id')->on('rarities');
         });

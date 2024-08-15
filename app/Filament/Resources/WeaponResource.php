@@ -42,13 +42,13 @@ class WeaponResource extends Resource
                     ->translateLabel()
                     ->autocapitalize('words')
                     ->columnSpan(2)
-                    ->dehydrateStateUsing(fn ($state) => ucwords($state))
-                    ->live(debounce:1000)
-                    ->afterStateUpdated(function(Set $set,Get $get, ?string $state,?string $old){
+                    ->dehydrateStateUsing(fn($state) => ucwords($state))
+                    ->live(debounce: 1000)
+                    ->afterStateUpdated(function (Set $set, Get $get, ?string $state, ?string $old) {
                         if (($get('slug') ?? '') !== Str::slug($old)) {
                             return;
                         }
-                        $set('slug',Str::slug($state));
+                        $set('slug', Str::slug($state));
                     })->required(),
                 TextInput::make('slug')
                     ->translateLabel()
@@ -60,23 +60,22 @@ class WeaponResource extends Resource
                 Select::make('type')
                     ->options(WeaponType::all()
                         ->pluck('name', 'id')
-                        ->map(fn ($name) => ucwords($name))
+                        ->map(fn($name) => ucwords($name))
                         ->toArray())->live()->required(),
                 SpatieMediaLibraryFileUpload::make('img')
-                ->disk('icon')
-                ->directory('weapons')
-                ->label('Upload Images')
-                ->preserveFilenames()
-                ->responsiveImages()
-                ->collection('weapon')
-                ->conversion('thumb')
-                ->columnSpan(3)->required(),
+                    ->disk('weapon')
+                    ->directory('weapons')
+                    ->label('Upload Images')
+                    ->preserveFilenames()
+                    ->responsiveImages()
+                    ->collection('weapon')
+                    ->conversion('thumb')
+                    ->columnSpan(3)->required(),
                 // FileUpload::make('img')
                 // ->label('Upload Images')
                 // ->directory('images/weapons')
                 // ->preserveFilenames()
                 // ->columnSpan(3)->required(),
-
             ])->columns(3);
     }
 
@@ -86,12 +85,12 @@ class WeaponResource extends Resource
             ->columns([
                 //
                 SpatieMediaLibraryImageColumn::make('img')
-                ->circular()
-                ->collection('weapon')
-                ->conversion('thumb')
-                ->disk('icon'),
+                    ->circular()
+                    ->collection('weapon')
+                    ->conversion('thumb')
+                    ->disk('icon'),
                 TextColumn::make('name')->searchable(),
-                TextColumn::make('weaponRarity.level')->sortable()->badge()->color(fn (string $state): string => match ($state) {
+                TextColumn::make('weaponRarity.level')->sortable()->badge()->color(fn(string $state): string => match ($state) {
                     'SSR' => 'danger',
                     'SR' => 'warning',
                     'R' => 'gray',

@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\MediaLibrary\HasMedia;
+use App\Models\CharacterAttribute;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Character extends Model
+class Character extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
     protected $guarded = ['id'];
 
     public function attributeType()
     {
-        return $this->belongsTo(Attribute::class, 'attribute');
+        return $this->belongsTo(CharacterAttribute::class, 'attribute');
     }
     public function weaponType()
     {

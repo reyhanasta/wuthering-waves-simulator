@@ -4,6 +4,7 @@ namespace App\Services;
 
 
 use App\Models\Weapon;
+use App\Models\Character;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 
@@ -49,7 +50,7 @@ class GachaService
     private function awardWeaponAndResetPity($rarityId, $fiveStarId, $fourStarId, $cacheDuration, $sessionId)
     {
         $this->resetPity($rarityId, $fiveStarId, $fourStarId, $cacheDuration, $sessionId);
-        return $this->getRandomWeaponByRarity($rarityId, $cacheDuration);
+        return $this->getRandomItemByRarity($rarityId, $cacheDuration); // Changed method name
     }
 
     private function resetPity($rarityId, $fiveStarId, $fourStarId, $cacheDuration, $sessionId)
@@ -64,10 +65,21 @@ class GachaService
         $pipeline->exec();
     }
 
-    public function getRandomWeaponByRarity($rarity, $cacheDuration)
+    public function getRandomItemByRarity($rarity, $cacheDuration)
     {
-        return Cache::remember("weapons_rarity_{$rarity}", $cacheDuration * 60, function () use ($rarity) {
-            return Weapon::where('rarity', $rarity)->get();
+        return Cache::remember("items_rarity_{$rarity}", $cacheDuration * 60, function () use ($rarity) {
+            $items = collect();
+
+            // Always include weapons
+            $weapons = Weapon::where('rarity', $rarity)->get();
+            $items = $items->concat($weapons);
+            // Include characters for SR and SSR rarities
+            if ($rarity == '2' || $rarity == '1') {
+                $characters = Character::where('rarity', $rarity)->get();
+                $items = $items->concat($characters);
+            }
+
+            return $items;
         })->random();
     }
 }

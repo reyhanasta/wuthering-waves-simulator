@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Attribute;
+use App\Models\CharacterAttribute;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -15,27 +16,27 @@ class AttributeSeeder extends Seeder
     public function run(): void
     {
         //Spectro Element
-        Attribute::insert([
+        CharacterAttribute::insert([
             'name' => 'spectro',
         ]);
         //Aero Element
-        Attribute::insert([
+        CharacterAttribute::insert([
             'name' => 'aero',
         ]);
         //Glacio Element
-        Attribute::insert([
+        CharacterAttribute::insert([
             'name' => 'glacio',
         ]);
         //Havoc Element
-        Attribute::insert([
+        CharacterAttribute::insert([
             'name' => 'havoc',
         ]);
         //Fusion Element
-        Attribute::insert([
+        CharacterAttribute::insert([
             'name' => 'fusion',
         ]);
         //Electro Element
-        Attribute::insert([
+        CharacterAttribute::insert([
             'name' => 'electro',
         ]);
     }

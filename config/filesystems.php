@@ -39,15 +39,23 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
         ],
 
-        'icon' => [
+        'weapon' => [
             'driver' => 'local',
             'root'   => storage_path('app/public/icons/weapons'),
-            'url'    => env('APP_URL').'/storage/icons/weapons',
+            'url'    => env('APP_URL') . '/storage/icons/weapons',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
+        'character' => [
+            'driver' => 'local',
+            'root'   => storage_path('app/public/icons/characters'),
+            'url'    => env('APP_URL') . '/storage/icons/characters',
             'visibility' => 'public',
             'throw' => false,
         ],

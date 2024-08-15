@@ -7,18 +7,20 @@
                     x-on:loading.window="isLoading = $event.detail.isLoading" >
                     <!-- Loading Indicator -->
                     <div wire:loading.class="absolute flex z-10 items-center justify-center m-0.5 loader"></div>
+
+
                     <!-- Gacha Results -->
                     @if ($gachaResults)
                     <div id="gachaResult"
-                        class="grid max-w-2xl gap-2 py-2 px-10 m-2 border-2 shadow-xl rounded-xl {{$displayStyle}} weapon-bg h-auto max-w-full bg-cover bg-center bg-no-repeat" >
+                        class="grid max-w-2xl gap-2 py-2 px-10 m-2 border-2 shadow-xl rounded-xl {{$displayStyle}} weapon-bg h-auto max-w-full bg-cover bg-center bg-no-repeat">
                         <!-- Replace this with your loading spinner -->
                         @foreach ($gachaResults as $item)
                         <div
                             class="relative overflow-hidden bg-gray-700 bg-center border-2 border-solid rounded-lg {{ $item['color'] }}">
                             @if ($item['owned'] == 'no')
-                                <div class="absolute top-0 left-0 p-1 text-xs font-bold text-white bg-yellow-500">New</div>
+                            <div class="absolute top-0 left-0 p-1 text-xs font-bold text-white bg-yellow-500">New</div>
                             @endif
-                            <div id="weapon" class="relative" >
+                            <div id="weapon" class="relative">
                                 <img class="object-cover w-full border-b-2 max-h-36  " loading="lazy"
                                     src="{{ $item['img'] }}" alt="{{ $item['name'] }}">
                                 <div class="absolute bottom-0 right-0">
@@ -37,15 +39,14 @@
                         src="{{ $bgImg }}" alt="">
                     @endif
                 </div>
-
                 <div id="statusArea" class="flex w-full font-semibold text-white">
                     <div class="grid w-full grid-cols-2">
                         <div id="pullStatus" class="justify-start">
                             <div id="pullCounter">
                                 <ul class="ml-6 list-disc">
-                                    <li>Total Summons: {{ $cachedData['totalPulls'] }}</li>
-                                    <li>Summons since last 4★ or higher: {{ $cachedData['pity4'] }}</li>
-                                    <li>Summons since last 5★: {{ $cachedData['pity5'] }}</li>
+                                    <li>Total Summons: {{ $cachedData['totalPulls'] ?? 0 }}</li>
+                                    <li>Summons since last 4★ or higher: {{ $cachedData['pity4'] ?? 0 }}</li>
+                                    <li>Summons since last 5★: {{ $cachedData['pity5'] ?? 0 }}</li>
                                 </ul>
                             </div>
 
@@ -93,7 +94,7 @@
                                 </ul>
                             </div>
                         </div>
-                        <div id="pullsArea" class="grid items-center justify-end grid-cols-2 gap-5" >
+                        <div id="pullsArea" class="grid items-center justify-end grid-cols-2 gap-5">
                             <button type="button" wire:click="singlePull" wire:loading.attr="disabled"
                                 wire:loading.class="opacity-50"
                                 class="px-4 py-2 text-black bg-white rounded-md hover:bg-blue-600 hover:text-white">
@@ -104,6 +105,7 @@
                                 class="px-4 py-2 text-black bg-white rounded-md hover:bg-blue-600 hover:text-white">10x
                                 Pulls
                             </button>
+
                         </div>
                     </div>
                 </div>
@@ -111,8 +113,14 @@
         </div>
     </div>
     <!-- Large Modal -->
+    {{-- <div x-data="{ open: false }">
+        <button x-on:click="open = ! open">Toggle Dropdown</button>
 
-    <div id="inventory-modal" tabindex="-1" aria-hidden="true"
+        <div x-show="open" x-transition>
+            Dropdown Contents...
+        </div>
+    </div> --}}
+    <div id="inventory-modal" tabindex="-1" aria-hidden="true" x-transition
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative w-full max-w-2xl max-h-full p-4">
             <!-- Modal content -->

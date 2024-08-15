@@ -2,14 +2,11 @@
 
 namespace App\Filament\Resources;
 
-use Attribute;
-use Filament\Forms;
 use Filament\Tables;
 use App\Models\Rarity;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
-use Filament\Pages\Page;
 use App\Models\Character;
 use App\Models\WeaponType;
 use Filament\Tables\Table;
@@ -18,12 +15,9 @@ use Filament\Resources\Resource;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Resources\Pages\CreateRecord;
-use App\Models\Attribute as ModelsAttribute;
 use App\Filament\Resources\CharacterResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\CharacterResource\RelationManagers;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use App\Models\CharacterAttribute;
 
 class CharacterResource extends Resource
 {
@@ -37,41 +31,50 @@ class CharacterResource extends Resource
             ->schema([
                 //
                 TextInput::make('name')
-                ->translateLabel()
+                    ->translateLabel()
                     ->columnSpan(2)
-                    ->live(debounce:1000)
-                    ->afterStateUpdated(function( Set $set,Get $get, ?string $state,?string $old) {
+                    ->live(debounce: 1000)
+                    ->afterStateUpdated(function (Set $set, Get $get, ?string $state, ?string $old) {
                         if (($get('slug') ?? '') !== Str::slug($old)) {
                             return;
                         }
-                        $set('slug',Str::slug($state));
+                        $set('slug', Str::slug($state));
                     })
-                    ->dehydrateStateUsing(fn ($state) => ucwords($state))
+                    ->dehydrateStateUsing(fn($state) => ucwords($state))
                     ->required(),
-                    TextInput::make('slug')
+                TextInput::make('slug')
                     ->readOnly()
                     ->filled()
-                    ->unique()
+                    // ->unique()
                     ->validationMessages([
-                        'unique' => 'The :attribute has already been registered.',
+                        // 'unique' => 'The :attribute has already been registered.',
                         'filled' => 'Harus di isi'
                     ]),
-                    Select::make('rarity')
+                Select::make('rarity')
                     ->options(Rarity::all()
-                    ->pluck('level', 'id')
-                    ->toArray())->live()->required(),
-                    Select::make('weapon')
+                        ->pluck('level', 'id')
+                        ->toArray())->live()->required(),
+                Select::make('weapon')
                     ->options(WeaponType::all()
-                    ->pluck('name', 'id')
-                    ->map(function ($name) {
-                        return ucwords($name);
-                    })->toArray())->live()->required(),
-                    Select::make('attribute')
-                    ->options(ModelsAttribute::all()
-                    ->pluck('name', 'id')
-                    ->map(function ($name) {
-                        return ucwords($name);
-                    })->toArray())->live()->required(),
+                        ->pluck('name', 'id')
+                        ->map(function ($name) {
+                            return ucwords($name);
+                        })->toArray())->live()->required(),
+                Select::make('attribute')
+                    ->options(CharacterAttribute::all()
+                        ->pluck('name', 'id')
+                        ->map(function ($name) {
+                            return ucwords($name);
+                        })->toArray())->live()->required(),
+                SpatieMediaLibraryFileUpload::make('icon')
+                    ->disk('character')
+                    ->directory('charaters')
+                    ->label('Upload Images')
+                    ->preserveFilenames()
+                    ->responsiveImages()
+                    ->collection('character')
+                    ->conversion('thumb')
+                    ->columnSpan(3)->required(),
             ]);
     }
 
