@@ -64,11 +64,10 @@ class StandardBanner extends Component
 
     public function singlePull(CacheService $cacheService, InventoryService $inventoryService, GachaService $gachaService)
     {
+
         // Debugging statement
         \Log::info('Starting single pull...');
         $this->dispatch('loading', ['isLoading' => true]);
-
-
         $gachaResult = $gachaService->getGachaResult($this->baseDropRates, $this->cacheDuration, $this->sessionId);
         Redis::incr('totalPulls_count_' . $this->sessionId);
 
@@ -121,7 +120,7 @@ class StandardBanner extends Component
         return [
             'id' => $gachaResult->id,
             'name' => $gachaResult->name,
-            'img' => $gachaResult->getFirstMediaUrl('weapon', 'thumb'),
+            'img' => $gachaResult->getFirstMediaUrl('gacha', 'thumb'),
             'type' => $gachaResult->type,
             'rarity' => $gachaResult->rarity,
             'color' => $this->colorPick($gachaResult->rarity),

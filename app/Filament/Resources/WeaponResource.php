@@ -63,12 +63,12 @@ class WeaponResource extends Resource
                         ->map(fn($name) => ucwords($name))
                         ->toArray())->live()->required(),
                 SpatieMediaLibraryFileUpload::make('img')
-                    ->disk('weapon')
+                    ->disk('gacha')
                     ->directory('weapons')
                     ->label('Upload Images')
                     ->preserveFilenames()
                     ->responsiveImages()
-                    ->collection('weapon')
+                    ->collection('gacha')
                     ->conversion('thumb')
                     ->columnSpan(3)->required(),
                 // FileUpload::make('img')

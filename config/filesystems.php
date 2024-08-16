@@ -60,6 +60,14 @@ return [
             'throw' => false,
         ],
 
+        'gacha' => [
+            'driver' => 'local',
+            'root'   => storage_path('app/public/icons/gacha'),
+            'url'    => env('APP_URL') . '/storage/icons/gacha',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

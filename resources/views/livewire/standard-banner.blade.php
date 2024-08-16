@@ -147,7 +147,7 @@
                     @foreach ($inventoryItems as $item)
                     <div
                         class="flex items-center p-1 bg-gray-500 border-2 border-yellow-300 border-solid rounded-lg shadow-slate-200">
-                        <img src="{{$item->getFirstMediaUrl('weapon','thumb') }}" alt="{{ $item->name }}" alt="Item"
+                        <img src="{{$item->getFirstMediaUrl('gacha','thumb') }}" alt="{{ $item->name }}" alt="Item"
                             class="w-10 mr-4 rounded-full border-slate-900">
                         <div>
                             <p class="text-sm font-medium text-white">{{ $item->name }}</p>

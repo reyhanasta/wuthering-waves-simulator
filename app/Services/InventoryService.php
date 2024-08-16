@@ -4,6 +4,8 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Redis;
 use App\Models\Weapon;
+use App\Models\Character;
+use Illuminate\Database\Eloquent\Model;
 
 class InventoryService
 {
@@ -16,11 +18,10 @@ class InventoryService
     public function addToInventory($gachaResult, $sessionId)
     {
         $key = 'inventory_' . $sessionId;
-        $itemKey = 'item_' . $gachaResult->id;
+        $itemKey = $this->getItemKey($gachaResult);
 
         $exists = Redis::hexists($key, $itemKey);
 
-        // Using pipeline to reduce the number of Redis connections
         Redis::pipeline(function ($pipe) use ($key, $itemKey, $exists) {
             if ($exists) {
                 $pipe->hincrby($key, $itemKey, 1);
@@ -41,17 +42,35 @@ class InventoryService
             return [];
         }
 
-        $itemIds = array_map(fn ($key) => intval(str_replace('item_', '', $key)), array_keys($inventory));
+        $weaponIds = [];
+        $characterIds = [];
 
-        $items = Weapon::whereIn('id', $itemIds)->get()->keyBy('id');
+        foreach (array_keys($inventory) as $key) {
+            list($type, $id) = explode('_', $key);
+            if ($type === 'weapon') {
+                $weaponIds[] = intval($id);
+            } elseif ($type === 'character') {
+                $characterIds[] = intval($id);
+            }
+        }
 
-        return collect($inventory)->map(function ($count, $key) use ($items) {
-            $id = intval(str_replace('item_', '', $key));
-            $item = $items[$id] ?? null;
+        $weapons = Weapon::whereIn('id', $weaponIds)->get()->keyBy('id');
+        $characters = Character::whereIn('id', $characterIds)->get()->keyBy('id');
+
+        return collect($inventory)->map(function ($count, $key) use ($weapons, $characters) {
+            list($type, $id) = explode('_', $key);
+            $id = intval($id);
+            $item = $type === 'weapon' ? ($weapons[$id] ?? null) : ($characters[$id] ?? null);
             if ($item) {
                 $item->count = $count;
                 return $item;
             }
         })->filter()->values();
+    }
+
+    private function getItemKey(Model $item): string
+    {
+        $type = $item instanceof Weapon ? 'weapon' : 'character';
+        return "{$type}_{$item->id}";
     }
 }

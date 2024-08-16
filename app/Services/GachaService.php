@@ -69,7 +69,6 @@ class GachaService
     {
         return Cache::remember("items_rarity_{$rarity}", $cacheDuration * 60, function () use ($rarity) {
             $items = collect();
-
             // Always include weapons
             $weapons = Weapon::where('rarity', $rarity)->get();
             $items = $items->concat($weapons);

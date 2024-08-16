@@ -67,12 +67,12 @@ class CharacterResource extends Resource
                             return ucwords($name);
                         })->toArray())->live()->required(),
                 SpatieMediaLibraryFileUpload::make('icon')
-                    ->disk('character')
+                    ->disk('gacha')
                     ->directory('charaters')
                     ->label('Upload Images')
                     ->preserveFilenames()
                     ->responsiveImages()
-                    ->collection('character')
+                    ->collection('gacha')
                     ->conversion('thumb')
                     ->columnSpan(3)->required(),
             ]);
