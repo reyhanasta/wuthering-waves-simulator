@@ -4,7 +4,7 @@
             <div class="flex flex-col items-center justify-center gap-3">
                 <div id="bannerArea" wire:loading.attr="disabled" wire:loading.class="relative opacity-50"
                     class="flex flex-col items-center justify-center" x-data="{ isLoading: false }"
-                    x-on:loading.window="isLoading = $event.detail.isLoading" >
+                    x-on:loading.window="isLoading = $event.detail.isLoading">
                     <!-- Loading Indicator -->
                     <div wire:loading.class="absolute flex z-10 items-center justify-center m-0.5 loader"></div>
 
@@ -21,7 +21,7 @@
                             <div class="absolute top-0 left-0 p-1 text-xs font-bold text-white bg-yellow-500">New</div>
                             @endif
                             <div id="weapon" class="relative">
-                                <img class="object-cover w-full border-b-2 max-h-36  " loading="lazy"
+                                <img class="object-cover w-full border-b-2 max-h-36 " loading="lazy"
                                     src="{{ $item['img'] }}" alt="{{ $item['name'] }}">
                                 <div class="absolute bottom-0 right-0">
                                     <p class="text-xl text-yellow-400">{{ str_repeat('★', $item['stars']) }}</p>
@@ -151,7 +151,14 @@
                             class="w-10 mr-4 rounded-full border-slate-900">
                         <div>
                             <p class="text-sm font-medium text-white">{{ $item->name }}</p>
-                            <p class="text-yellow-500">{{ str_repeat('★', $item->rarity) }}</p>
+                            <p class="text-yellow-500">
+                                @if ( $item->rarity == 1)
+                                    {{str_repeat('★',5)}}
+                                @elseif($item->rarity == 2)
+                                {{str_repeat('★',4)}}
+                                @else
+                                {{str_repeat('★',3)}}
+                                @endif</p>
                             <p class="text-sm text-white">{{ $item->count }}x</p>
                         </div>
                     </div>

@@ -26,22 +26,22 @@ class CharaceterSeeder extends Seeder
 
         //Jianxin 5 Star Standard
         Character::insert([
-            'name' => 'jianxin',
+            'name' => 'Jianxin',
             'slug' => 'jianxin',
             'attribute' => 2,
             'weapon' => 2,
-            'rarity' => 2,
+            'rarity' => 1,
             'specifications' => 'standard',
         ]);
 
         //Changli 5 Star Limited
-        Character::insert([
-            'name' => 'Rover(Havoc)',
-            'slug' => 'rover-havoc',
-            'attribute' => 5,
-            'weapon' => 1,
-            'rarity' => 1,
-            'specifications' => 'standard',
-        ]);
+        // Character::insert([
+        //     'name' => 'Rover(Havoc)',
+        //     'slug' => 'rover-havoc',
+        //     'attribute' => 5,
+        //     'weapon' => 1,
+        //     'rarity' => 1,
+        //     'specifications' => 'standard',
+        // ]);
     }
 }

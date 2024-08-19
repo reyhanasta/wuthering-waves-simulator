@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('rarities', function (Blueprint $table) {
             $table->id();
             $table->enum('level',['SSR','SR','R']);
+            $table->enum('star',[5,4,3]);
             $table->enum('drop_rates',[0.8,6.0,93.2]);
             $table->timestamps();
         });

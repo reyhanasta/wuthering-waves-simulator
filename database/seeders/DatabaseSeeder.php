@@ -28,9 +28,9 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
+            RaritySeeder::class,
             AttributeSeeder::class,
             WeaponTypeSeeder::class,
-            RaritySeeder::class,
             CharaceterSeeder::class,
             // WeaponSeeder::class
         ]);

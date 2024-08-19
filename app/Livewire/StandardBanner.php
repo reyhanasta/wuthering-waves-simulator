@@ -64,7 +64,6 @@ class StandardBanner extends Component
 
     public function singlePull(CacheService $cacheService, InventoryService $inventoryService, GachaService $gachaService)
     {
-
         // Debugging statement
         \Log::info('Starting single pull...');
         $this->dispatch('loading', ['isLoading' => true]);
@@ -88,7 +87,6 @@ class StandardBanner extends Component
         // Debugging statement
         \Log::info('Starting ten pulls...');
         // $this->dispatch('loading', ['isLoading' => true]);
-
 
         $results = [];
 
