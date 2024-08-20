@@ -86,9 +86,9 @@ class WeaponResource extends Resource
                 //
                 SpatieMediaLibraryImageColumn::make('img')
                     ->circular()
-                    ->collection('weapon')
+                    ->collection('gacha')
                     ->conversion('thumb')
-                    ->disk('icon'),
+                    ->disk('gacha'),
                 TextColumn::make('name')->searchable(),
                 TextColumn::make('weaponRarity.level')->sortable()->badge()->color(fn(string $state): string => match ($state) {
                     'SSR' => 'danger',

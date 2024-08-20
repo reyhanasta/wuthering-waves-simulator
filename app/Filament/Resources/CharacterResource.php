@@ -12,12 +12,14 @@ use App\Models\WeaponType;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Filament\Resources\Resource;
+use App\Models\CharacterAttribute;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\ImageColumn;
 use App\Filament\Resources\CharacterResource\Pages;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use App\Models\CharacterAttribute;
 
 class CharacterResource extends Resource
 {
@@ -33,7 +35,7 @@ class CharacterResource extends Resource
                 TextInput::make('name')
                     ->translateLabel()
                     ->columnSpan(2)
-                    ->live(debounce: 1000)
+                    ->live(debounce: 500)
                     ->afterStateUpdated(function (Set $set, Get $get, ?string $state, ?string $old) {
                         if (($get('slug') ?? '') !== Str::slug($old)) {
                             return;
@@ -54,18 +56,8 @@ class CharacterResource extends Resource
                     ->options(Rarity::all()
                         ->pluck('level', 'id')
                         ->toArray())->live()->required(),
-                Select::make('weapon')
-                    ->options(WeaponType::all()
-                        ->pluck('name', 'id')
-                        ->map(function ($name) {
-                            return ucwords($name);
-                        })->toArray())->live()->required(),
-                Select::make('attribute')
-                    ->options(CharacterAttribute::all()
-                        ->pluck('name', 'id')
-                        ->map(function ($name) {
-                            return ucwords($name);
-                        })->toArray())->live()->required(),
+                Select::make('weapon')->relationship('weaponType', 'name')->required(),
+                Select::make('attribute')->relationship('attributeType', 'name')->required(),
                 SpatieMediaLibraryFileUpload::make('icon')
                     ->disk('gacha')
                     ->directory('charaters')
@@ -83,7 +75,16 @@ class CharacterResource extends Resource
         return $table
             ->columns([
                 //
-                TextColumn::make('name')
+                Tables\Columns\TextColumn::make('weaponType.name')
+                    ->label('Weapon Type'),
+                ImageColumn::make('image')
+                    ->circular()
+                    ->label('Character Image'),
+                TextColumn::make('name')->searchable(),
+                // ImageColumn::make('weaponType.weaponType')
+                //     ->label('Weapon Icon')
+                //     ->circular(),
+                TextColumn::make('attributeType.name')->searchable(),
             ])
             ->filters([
                 //

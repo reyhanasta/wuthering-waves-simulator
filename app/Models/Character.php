@@ -18,12 +18,25 @@ class Character extends Model implements HasMedia
     {
         return $this->belongsTo(CharacterAttribute::class, 'attribute');
     }
+
     public function weaponType()
     {
         return $this->belongsTo(WeaponType::class, 'weapon');
     }
+
     public function characterRarity()
     {
         return $this->belongsTo(Rarity::class, 'rarity');
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('gacha')->singleFile();
+    }
+
+    // Accessor untuk gambar karakter
+    public function getImageAttribute()
+    {
+        return $this->getFirstMediaUrl('gacha');
     }
 }
