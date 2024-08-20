@@ -21,4 +21,16 @@ class WeaponType extends Model implements HasMedia
     {
         return $this->hasMany(Character::class);
     }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('weaponType')
+            ->singleFile();
+    }
+
+    // Accessor untuk ikon weapon type
+    public function getIconAttribute()
+    {
+        return $this->getFirstMediaUrl('weaponType');
+    }
 }

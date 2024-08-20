@@ -7,8 +7,6 @@
                     x-on:loading.window="isLoading = $event.detail.isLoading">
                     <!-- Loading Indicator -->
                     <div wire:loading.class="absolute flex z-10 items-center justify-center m-0.5 loader"></div>
-
-
                     <!-- Gacha Results -->
                     @if ($gachaResults)
                     <div id="gachaResult"

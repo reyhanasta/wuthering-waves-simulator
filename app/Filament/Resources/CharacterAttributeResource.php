@@ -5,39 +5,39 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
-use App\Models\WeaponType;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use App\Models\CharacterAttribute;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\WeaponTypeResource\Pages;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use App\Filament\Resources\WeaponTypeResource\RelationManagers;
+use App\Filament\Resources\CharacterAttributeResource\Pages;
+use App\Filament\Resources\CharacterAttributeResource\RelationManagers;
 
-class WeaponTypeResource extends Resource
+class CharacterAttributeResource extends Resource
 {
-    protected static ?string $model = WeaponType::class;
+    protected static ?string $model = CharacterAttribute::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-adjustments-vertical';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 //
-                SpatieMediaLibraryFileUpload::make('weaponType')
-                    ->disk('weaponType')
-                    ->directory('weaponType')
-                    ->label('Upload Images')
-                    ->preserveFilenames()
-                    ->responsiveImages()
-                    ->collection('weaponType')
-                    ->conversion('thumb')
-                    ->columnSpan(3)->required(),
-                TextInput::make('name')
+                TextInput::make('name'),
+                SpatieMediaLibraryFileUpload::make('icon')
+                ->disk('attribute')
+                ->directory('weapons')
+                ->label('Upload Images')
+                ->preserveFilenames()
+                ->responsiveImages()
+                ->collection('attribute')
+                ->conversion('thumb')
+                ->columnSpan(3)->required(),
             ]);
     }
 
@@ -47,10 +47,11 @@ class WeaponTypeResource extends Resource
             ->columns([
                 //
                 SpatieMediaLibraryImageColumn::make('icon')
-                    ->collection('weaponType')
+                    ->circular()
+                    ->collection('attribute')
                     ->conversion('thumb')
-                    ->disk('weaponType'),
-                TextColumn::make('name')
+                    ->disk('attribute'),
+                TextColumn::make('name')->searchable()
             ])
             ->filters([
                 //
@@ -75,9 +76,9 @@ class WeaponTypeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListWeaponTypes::route('/'),
-            'create' => Pages\CreateWeaponType::route('/create'),
-            'edit' => Pages\EditWeaponType::route('/{record}/edit'),
+            'index' => Pages\ListCharacterAttributes::route('/'),
+            'create' => Pages\CreateCharacterAttribute::route('/create'),
+            'edit' => Pages\EditCharacterAttribute::route('/{record}/edit'),
         ];
     }
 }
