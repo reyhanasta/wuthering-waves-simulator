@@ -75,16 +75,17 @@ class CharacterResource extends Resource
         return $table
             ->columns([
                 //
-                Tables\Columns\TextColumn::make('weaponType.name')
-                    ->label('Weapon Type'),
-                ImageColumn::make('image')
-                    ->circular()
-                    ->label('Character Image'),
+                ImageColumn::make('weaponType.name')
+                    ->label('Weapon Image')
+                    ->getStateUsing(function (Character $record) {
+                        return $record->weaponType->getFirstMediaUrl('weaponType', 'weaponType'); // Mengambil URL gambar pertama dari WeaponType
+                    })->label('Weapon Type'),
                 TextColumn::make('name')->searchable(),
-                // ImageColumn::make('weaponType.weaponType')
-                //     ->label('Weapon Icon')
-                //     ->circular(),
-                TextColumn::make('attributeType.name')->searchable(),
+                ImageColumn::make('attributeType.name')
+                    ->label('Attribute')
+                    ->getStateUsing(function (Character $record) {
+                        return $record->attributeType->getFirstMediaUrl('attribute', 'attribute'); // Mengambil URL gambar pertama dari WeaponType
+                    }),
             ])
             ->filters([
                 //

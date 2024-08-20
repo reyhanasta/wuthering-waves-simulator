@@ -29,14 +29,9 @@ class Character extends Model implements HasMedia
         return $this->belongsTo(Rarity::class, 'rarity');
     }
 
-    public function registerMediaCollections(): void
+    public function getImageUrl()
     {
-        $this->addMediaCollection('gacha')->singleFile();
-    }
-
-    // Accessor untuk gambar karakter
-    public function getImageAttribute()
-    {
-        return $this->getFirstMediaUrl('gacha');
+        $media = $this->getFirstMedia();
+        return $media ? $media->getUrl() : null;
     }
 }
