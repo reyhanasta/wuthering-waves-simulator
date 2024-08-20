@@ -153,7 +153,7 @@
                             <p class="text-sm font-medium text-white">{{ $item->name }}</p>
                             <p class="text-yellow-500">
                                 @if ( $item->rarity == 1)
-                                    {{str_repeat('★',5)}}
+                                {{str_repeat('★',5)}}
                                 @elseif($item->rarity == 2)
                                 {{str_repeat('★',4)}}
                                 @else
