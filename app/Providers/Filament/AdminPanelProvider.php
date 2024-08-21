@@ -53,6 +53,14 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->colors([
+                'primary' => Color::Blue,
+                'super-rare' => Color::Yellow,
+                'rare' => Color::Fuchsia,
+            ])
+            ->sidebarCollapsibleOnDesktop()
+            ->brandName('Wuthering Waves');
+            // ->brandLogo(asset('/storage/images/background/T_IconMotefeiQTE_UI.png'));
     }
 }

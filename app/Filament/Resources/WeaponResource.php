@@ -14,7 +14,9 @@ use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Filament\Resources\Resource;
 use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
+use Filament\Support\Enums\Alignment;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\ImageColumn;
@@ -23,15 +25,29 @@ use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\WeaponResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use App\Filament\Resources\WeaponResource\RelationManagers;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 
 class WeaponResource extends Resource
 {
     protected static ?string $model = Weapon::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rocket-launch';
+
+    protected static ?int $navigationSort = 2;
+
+    protected static ?string $navigationGroup = 'Main Item';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return static::getModel()::count() == 0 ? 'danger' : 'primary';
+    }
 
     public static function form(Form $form): Form
     {
@@ -50,9 +66,7 @@ class WeaponResource extends Resource
                         }
                         $set('slug', Str::slug($state));
                     })->required(),
-                TextInput::make('slug')
-                    ->translateLabel()
-                    ->readOnly(),
+                Hidden::make('slug'),
                 Select::make('rarity')
                     ->options(Rarity::all()
                         ->pluck('level', 'id')
@@ -71,11 +85,6 @@ class WeaponResource extends Resource
                     ->collection('gacha')
                     ->conversion('thumb')
                     ->columnSpan(3)->required(),
-                // FileUpload::make('img')
-                // ->label('Upload Images')
-                // ->directory('images/weapons')
-                // ->preserveFilenames()
-                // ->columnSpan(3)->required(),
             ])->columns(3);
     }
 
@@ -88,14 +97,21 @@ class WeaponResource extends Resource
                     ->circular()
                     ->collection('gacha')
                     ->conversion('thumb')
-                    ->disk('gacha'),
+                    ->disk('gacha')
+                    ->size(50)->alignment(Alignment::Center),
                 TextColumn::make('name')->searchable(),
-                TextColumn::make('weaponRarity.level')->sortable()->badge()->color(fn(string $state): string => match ($state) {
-                    'SSR' => 'danger',
-                    'SR' => 'warning',
-                    'R' => 'gray',
-                }),
-                TextColumn::make('weaponType.name')->sortable(),
+                TextColumn::make('weaponRarity.level')
+                    ->sortable()
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'SSR' => 'super-rare',
+                        'SR' => 'rare',
+                        'R' => 'primary',
+                    })->alignment(Alignment::Center),
+                ImageColumn::make('weaponType.name')
+                    ->getStateUsing(function (Weapon $record) {
+                        return $record->weaponType->getFirstMediaUrl('weaponType', 'weaponType'); // Mengambil URL gambar pertama dari WeaponType
+                    })->label('Weapon Type')->alignment(Alignment::Center),
             ])
             ->filters([
                 //
@@ -103,6 +119,15 @@ class WeaponResource extends Resource
                     ->options(
                         WeaponType::all()
                             ->pluck('name', 'id')
+                            ->map(function ($name) {
+                                return ucwords($name);
+                            })
+                            ->toArray()
+                    ),
+                SelectFilter::make('rarity')
+                    ->options(
+                        Rarity::all()
+                            ->pluck('level', 'id')
                             ->map(function ($name) {
                                 return ucwords($name);
                             })

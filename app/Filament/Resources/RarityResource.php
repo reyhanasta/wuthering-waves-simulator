@@ -18,7 +18,11 @@ class RarityResource extends Resource
 {
     protected static ?string $model = Rarity::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-chart-pie';
+
+    protected static ?int $navigationSort = 4;
+
+    protected static ?string $navigationGroup = 'Settings';
 
     public static function form(Form $form): Form
     {
@@ -34,13 +38,13 @@ class RarityResource extends Resource
             ->columns([
                 //
                 TextColumn::make('level')
-                ->badge()
-                ->color(fn (string $state): string => match ($state) {
-                    'SSR' => 'danger',
-                    'SR' => 'warning',
-                    'R' => 'gray',
-                }),
-                TextColumn::make('drop_rates')->numeric()->suffix('%')->color('success'),
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'SSR' => 'super-rare',
+                        'SR' => 'rare',
+                        'R' => 'primary',
+                    }),
+                TextColumn::make('drop_rates')->numeric()->suffix('%')->color('gray'),
             ])
             ->filters([
                 //

@@ -25,7 +25,7 @@
                                     <p class="text-xl text-yellow-400">{{ str_repeat('★', $item['stars']) }}</p>
                                 </div>
                             </div>
-                            <div class="flex items-center justify-center h-16 p-4">
+                            <div class="flex items-center justify-center h-20 p-4">
                                 <p class="text-center text-white text-md">{{ $item['name'] }}</p>
                             </div>
                         </div>
@@ -148,7 +148,7 @@
                         <img src="{{$item->getFirstMediaUrl('gacha','thumb') }}" alt="{{ $item->name }}" alt="Item"
                             class="w-10 mr-4 rounded-full border-slate-900">
                         <div>
-                            <p class="text-sm font-medium text-white">{{ $item->name }}</p>
+                            <p class="text-xs font-medium text-white">{{ $item->name }}</p>
                             <p class="text-yellow-500">
                                 @if ( $item->rarity == 1)
                                 {{str_repeat('★',5)}}
@@ -165,9 +165,7 @@
                 </div>
                 @else
                 <div class="relative gap-6 p-4 text-center item-center">
-
                     <span>none</span>
-
                 </div>
                 @endif
 
@@ -214,8 +212,8 @@
                     No Resonators or Weapons have an increased rate on this Convene.
                     You can only use Lustrous Tides on this banner (basic summon ticket).
 
-                    You can only obtain one of the below 5★ Resonators from the Novice Convene: Verina, Encore,
-                    Calcharo, Lingyang & Jianxin.
+                    You can only obtain one of the below 5★ Resonators from the Novice Convene:
+                    <br>Verina, Encore,Calcharo, Lingyang & Jianxin.
                     </p>
                 </div>
                 <!-- Modal footer -->

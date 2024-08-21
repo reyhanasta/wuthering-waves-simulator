@@ -21,4 +21,10 @@ class Weapon extends Model implements HasMedia
     {
         return $this->belongsTo(WeaponType::class, 'type');
     }
+
+    public function getImageUrl()
+    {
+        $media = $this->getFirstMedia();
+        return $media ? $media->getUrl() : null;
+    }
 }

@@ -21,7 +21,14 @@ class CharacterAttributeResource extends Resource
 {
     protected static ?string $model = CharacterAttribute::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?string $navigationLabel = 'Attributes';
+
+    protected static ?int $navigationSort = 3;
+
+    protected static ?string $navigationGroup = 'Settings';
+
+    protected static ?string $navigationIcon = 'heroicon-o-fire';
 
     public static function form(Form $form): Form
     {

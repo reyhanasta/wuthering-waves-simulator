@@ -9,4 +9,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateCharacterAttribute extends CreateRecord
 {
     protected static string $resource = CharacterAttributeResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

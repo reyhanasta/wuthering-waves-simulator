@@ -16,4 +16,6 @@ class ListCharacters extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+
+
 }
