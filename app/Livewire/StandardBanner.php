@@ -65,7 +65,8 @@ class StandardBanner extends Component
     public function singlePull(CacheService $cacheService, InventoryService $inventoryService, GachaService $gachaService)
     {
         // Debugging statement
-        \Log::info('Starting single pull...');
+        // \Log::info('Starting single pull...');
+        $this->isLoading = true;
         $this->dispatch('loading', ['isLoading' => true]);
         $gachaResult = $gachaService->getGachaResult($this->baseDropRates, $this->cacheDuration, $this->sessionId);
         Redis::incr('totalPulls_count_' . $this->sessionId);
@@ -74,18 +75,18 @@ class StandardBanner extends Component
             $this->processGachaResults([$gachaResult], $inventoryService);
             $this->cachedData = $cacheService->getCacheData($this->sessionId);
             $this->displayStyle = 'grid-cols-1';
-            $this->dispatch('loading', ['isLoading' => false]);
         } else {
             $this->gachaResults = ['errors'];
-            $this->dispatch('loading', ['isLoading' => false]);
         }
-        \Log::info('Single pull completed.');
+        $this->dispatch('loading', ['isLoading' => false]);
+        $this->isLoading = false;
+        // \Log::info('Single pull completed.');
     }
 
     public function tenPulls(CacheService $cacheService, InventoryService $inventoryService, GachaService $gachaService)
     {
         // Debugging statement
-        \Log::info('Starting ten pulls...');
+        // \Log::info('Starting ten pulls...');
         // $this->dispatch('loading', ['isLoading' => true]);
 
         $results = [];
@@ -101,12 +102,12 @@ class StandardBanner extends Component
         $this->processGachaResults($results, $inventoryService);
         $this->cachedData = $cacheService->getCacheData($this->sessionId);
         $this->displayStyle = 'grid-cols-5';
-        \Log::info('Ten pulls completed.');
+        // \Log::info('Ten pulls completed.');
     }
 
     private function processGachaResults(array $gachaResults, InventoryService $inventoryService)
     {
-        $this->gachaResults = collect($gachaResults)->map(function($gachaResult) use ($inventoryService) {
+        $this->gachaResults = collect($gachaResults)->map(function ($gachaResult) use ($inventoryService) {
             return $this->formatGachaResult($gachaResult, $inventoryService);
         })->toArray();
 

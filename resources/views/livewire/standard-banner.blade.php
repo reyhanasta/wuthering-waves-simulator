@@ -94,12 +94,13 @@
                         </div>
                         <div id="pullsArea" class="grid items-center justify-end grid-cols-2 gap-5">
                             <button type="button" wire:click="singlePull" wire:loading.attr="disabled"
-                                wire:loading.class="opacity-50"
+                                wire:loading.class="opacity-50" wire:target='singlePull,tenPulls'
                                 class="px-4 py-2 text-black bg-white rounded-md hover:bg-blue-600 hover:text-white">
                                 <span>Single Pull</span>
                             </button>
+
                             <button type="button" wire:click="tenPulls" wire:loading.attr="disabled"
-                                wire:loading.class="opacity-50"
+                                wire:loading.class="opacity-50" wire:target='singlePull,tenPulls'
                                 class="px-4 py-2 text-black bg-white rounded-md hover:bg-blue-600 hover:text-white">10x
                                 Pulls
                             </button>
@@ -122,7 +123,7 @@
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative w-full max-w-2xl max-h-full p-4">
             <!-- Modal content -->
-            <div class="relative bg-gray-800 border-white shadow rounded-2xl">
+            <div class="relative bg-gray-800 border-black border-2 shadow rounded-2xl">
                 <!-- Modal header -->
                 <div class="flex items-center justify-between p-4 border-b rounded-t md:p-5 dark:border-black">
                     <h3 class="text-xl font-semibold text-white">
@@ -181,9 +182,9 @@
     <!-- Large Modal -->
     <div id="detail-note-modal" tabindex="-1" aria-hidden="true"
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-        <div class="relative w-full max-w-2xl max-h-full p-4">
+        <div class="relative w-full max-w-2xl max-h-full p-4 ">
             <!-- Modal content -->
-            <div class="relative bg-gray-800 border-white shadow rounded-2xl">
+            <div class="relative bg-gray-800 border-yellow-300 border-2 shadow rounded-2xl">
                 <!-- Modal header -->
                 <div class="flex items-center justify-between p-4 border-b rounded-t md:p-5 dark:border-black">
                     <h3 class="text-xl font-semibold text-white">
@@ -200,7 +201,7 @@
                         <span class="sr-only">Close modal</span>
                     </button>
                 </div>
-                <div class="relative p-7">
+                <div class="relative p-7 text-white">
                     <span><b> <u>Information about Novice Convene:</u></b></span>
                     <p>
                     <ul>
@@ -213,7 +214,8 @@
                     You can only use Lustrous Tides on this banner (basic summon ticket).
 
                     You can only obtain one of the below 5★ Resonators from the Novice Convene:
-                    <br>Verina, Encore,Calcharo, Lingyang & Jianxin.
+                    <br>
+                    <b>Verina, Encore,Calcharo, Lingyang & Jianxin.</b>
                     </p>
                 </div>
                 <!-- Modal footer -->
