@@ -10,8 +10,7 @@ To install and run this project, follow these steps:
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/username/wuthering-waves-gacha-simulator.git
-
+   git clone https://github.com/reyhanasta/wuthering-waves-simulator.git
 2. **Install Frontend Dependencies (NPM)**:
    ```bash
    npm install
