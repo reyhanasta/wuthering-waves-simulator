@@ -7,7 +7,7 @@
             <div class="relative w-full max-w-2xl px-6 lg:max-w-7xl">
                 <header class="grid items-center grid-cols-2 py-3 lg:grid-cols-3">
                     <div class="flex lg:justify-end lg:col-start-2">
-                        
+
 
                     </div>
                 </header>
@@ -17,7 +17,13 @@
                         <div id="gachaContainer" class="flex flex-row items-center justify-center gap-3 lg:grid-cols-2">
                             <div id="bannerArea" class="flex items-start ">
                                 {{-- <div id="closeBtnArea" class="flex justify-end">
-                                    <button id="closeButton" class="items-end p-2 m-2 text-white bg-gray-800 rounded-full focus:outline-none"><svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                                    <button id="closeButton"
+                                        class="items-end p-2 m-2 text-white bg-gray-800 rounded-full focus:outline-none"><svg
+                                            xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12" />
+                                        </svg></button>
                                 </div> --}}
                                 <div id="docs-card"
                                     class="w-max items-start overflow-hidden rounded-2xl bg-white shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] md:row-span-3 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]">
@@ -34,8 +40,7 @@
 
                                     </div>
                                     <div id="bg-img" class="max-w-2xl ">
-                                        <img class="rounded-2xl w-max" src="{{ $bgImg }}" loading="lazy"
-                                            alt="bg-img">
+                                        <img class="rounded-2xl w-max" src="{{ $bgImg }}" loading="lazy" alt="bg-img">
                                     </div>
                                 </div>
 
@@ -124,7 +129,8 @@
                         </div>
                     </div>
                 </main>
-                <x-layouts.footer></x-layouts>
+                <x-layouts.footer>
+                    </x-layouts>
             </div>
         </div>
     </div>

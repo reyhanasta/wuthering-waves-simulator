@@ -24,7 +24,7 @@ class Weapon extends Model implements HasMedia
 
     public function getImageUrl()
     {
-        $media = $this->getFirstMedia();
+        $media = $this->getFirstMedia() ;
         return $media ? $media->getUrl() : null;
     }
 }

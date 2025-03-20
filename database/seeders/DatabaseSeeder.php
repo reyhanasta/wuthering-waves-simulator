@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
             AttributeSeeder::class,
             WeaponTypeSeeder::class,
             CharaceterSeeder::class,
-            // WeaponSeeder::class
+            WeaponSeeder::class
         ]);
     }
 }

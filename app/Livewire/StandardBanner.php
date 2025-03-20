@@ -44,7 +44,7 @@ class StandardBanner extends Component
         $this->sessionId = Session::getId();
         $this->baseDropRates = $this->getBaseDropRates($this->cacheDuration);
 
-        $this->bgImg = Storage::url('public/images/background/gacha-banner.jpg');
+        $this->bgImg = Storage::url('public/images/background/gacha-banner-2.jpg');
         $this->weaponImg = Storage::url('public/images/background/T_LuckdrawShare.png');
         $this->cachedData = $cacheService->getCacheData($this->sessionId);
 
@@ -119,13 +119,25 @@ class StandardBanner extends Component
         return [
             'id' => $gachaResult->id,
             'name' => $gachaResult->name,
-            'img' => $gachaResult->getFirstMediaUrl('gacha', 'thumb'),
+            'img' => $gachaResult->getFirstMediaUrl('gacha', 'thumb') ?: self::getDefaultImage($gachaResult->rarity),
             'type' => $gachaResult->type,
             'rarity' => $gachaResult->rarity,
             'color' => $this->colorPick($gachaResult->rarity),
             'stars' => $this->weaponStars($gachaResult->rarity),
             'owned' => $inventoryService->addToInventory($gachaResult, $this->sessionId),
         ];
+    }
+
+    private static function getDefaultImage($rarity)
+    {
+        // Sesuaikan gambar default berdasarkan rarity
+        $defaultImages = [
+            1 => asset('storage/icons/default/T_IconMap_Task_11_1_UI.png'), // ★5
+            2 => asset('storage/icons/default/T_IconMap_Task_03_1_UI.png'), // ★4
+            3 => asset('storage/icons/default/T_IconMap_Task_02_1_UI.png'), // ★3
+        ];
+
+        return $defaultImages[$rarity] ?? asset('storage/icons/default/T_IconMap_Shop_Weapon_UI.png');
     }
 
     public function resetPity($rarity)

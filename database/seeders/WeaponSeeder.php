@@ -17,19 +17,19 @@ class WeaponSeeder extends Seeder
 
         $weapons = [
             [
-                'name' => 'Sword of Night',
-                'slug' => 'sword-of-night',
-                'type' => 1,
-                'rarity' => 3,
-                'img' => '/images/weapons/iron-sword.png',
-                'specifications' => 'standard'
-            ],
-            [
                 'name' => 'Marcato',
                 'slug' => 'marcato',
                 'type' => 2,
                 'rarity' => 2,
-                'img' => '/images/weapons/marcato.png',
+                'img' => '1/T_Luckdraw21040024_UI.png',
+                'specifications' => 'standard'
+            ],
+            [
+                'name' => 'Sword of Night',
+                'slug' => 'sword-of-night',
+                'type' => 1,
+                'rarity' => 3,
+                'img' => '/',
                 'specifications' => 'standard'
             ],
             [
@@ -37,7 +37,7 @@ class WeaponSeeder extends Seeder
                 'slug' => 'verdant-summit',
                 'type' => 3,
                 'rarity' => 1,
-                'img' => '/images/weapons/ages-of-harvest.png',
+                'img' => '/',
                 'specifications' => 'limited'
             ],
             // tambahkan senjata lainnya
@@ -45,7 +45,7 @@ class WeaponSeeder extends Seeder
 
 
         foreach ($weapons as $weapon) {
-            Weapon::insert([
+            $newWeapon = Weapon::create([
                 'name'=> $weapon['name'],
                 'slug'=> $weapon['slug'],
                 'img'=> $weapon['img'],
@@ -54,6 +54,16 @@ class WeaponSeeder extends Seeder
                 'specifications'=> $weapon['specifications'],
                 ]
             );
+
+               // Path ke file di public/storage/icons/gacha/
+               $imagePath = asset('storage/icons/gacha/'.$weapon['img']);
+               
+
+            if (file_exists($imagePath)) {
+                $newWeapon->addMedia($imagePath)
+                          ->preservingOriginal()
+                          ->toMediaCollection('gacha', 'gacha'); // Sesuai dengan konfigurasi disk
+            }
         }
     }
 }
