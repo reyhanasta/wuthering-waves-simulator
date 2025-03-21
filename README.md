@@ -34,9 +34,10 @@ To install and run this project, follow these steps:
    php artisan key:generate
    ```
 
-6. **Run Database Migration**:  
+6. **Run Database Migration with Dummy Data**:  
+   To populate the system with dummy data, run the following command:  
    ```bash
-   php artisan migrate
+   php artisan migrate:fresh --seed
    ```
 
 7. **Run Vite**: Compile your frontend assets using Vite.  
@@ -59,6 +60,10 @@ After installation and setup, you can access the application through:
 2. **Admin Page**:  
    [http://localhost:8000/admin](http://localhost:8000/admin)  
    Access the admin panel created with Filament, where you can manage the application's data and settings.  
+
+   - **Default Admin Login Credentials**:  
+     - **Username/Email**: `admin@gmail.com`  
+     - **Password**: `admin`  
 
 ### Missing Images Notice  
 Currently, some menus in the system still do not have images and are using **dummy data**. The following menus need image updates via the **admin panel**:  
