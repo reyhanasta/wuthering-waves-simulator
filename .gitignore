@@ -18,5 +18,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-!public/icons/default
-!public/images/background
+!public/storage/icons/default
+!public/stroage/images/background
