@@ -931,16 +931,6 @@
         background-image: url('/storage/images/background/T_LuckdrawShare.png');
     }
 
-    .loader {
-        border: 8px solid #f3f3f3;
-        /* Light grey */
-        border-top: 8px solid #3498db;
-        /* Blue */
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        animation: spin 2s linear infinite;
-    }
 
     @keyframes spin {
         0% {
@@ -949,6 +939,29 @@
 
         100% {
             transform: rotate(360deg);
+        }
+    }
+
+    #gachaResult {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    @media (min-width: 640px) {
+        #gachaResult {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        }
+    }
+
+    @media (min-width: 768px) {
+        #gachaResult {
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        #gachaResult {
+            grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
         }
     }
 </style>

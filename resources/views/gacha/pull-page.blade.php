@@ -55,7 +55,7 @@
                                                 <li>Total Summons: {{ $cachedData['totalPulls'] }}</li>
                                                 <li>Summons since last 4★ or higher:
                                                     {{ $cachedData['pitty4'] }}</li>
-                                                <li>Summons since last 5★: {{ $cachedData['pitty5'] }}</li>
+                                                <li>Summons sinces last 5★: {{ $cachedData['pitty5'] }}</li>
                                             </ul>
                                         </div>
                                         <div id="nav-bar" class="flex justify-between p-5 mt-5 w-flex">
