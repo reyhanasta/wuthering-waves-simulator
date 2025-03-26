@@ -37,29 +37,34 @@ class InventoryService
     {
         $key = 'inventory_' . $sessionId;
         $inventory = Redis::hgetall($key);
-
-        if (empty($inventory)) {
-            return [];
-        }
-
+    
+        if (empty($inventory)) return [];
+    
         $weaponIds = [];
         $characterIds = [];
-
+    
         foreach (array_keys($inventory) as $key) {
-            list($type, $id) = explode('_', $key);
-            if ($type === 'weapon') {
-                $weaponIds[] = intval($id);
-            } elseif ($type === 'character') {
-                $characterIds[] = intval($id);
+            if (preg_match('/^(weapon|character)_(\d+)$/', $key, $matches)) {
+                $type = $matches[1];
+                $id = (int) $matches[2];
+    
+                if ($type === 'weapon') {
+                    $weaponIds[] = $id;
+                } else {
+                    $characterIds[] = $id;
+                }
             }
         }
-
+    
         $weapons = Weapon::whereIn('id', $weaponIds)->get()->keyBy('id');
         $characters = Character::whereIn('id', $characterIds)->get()->keyBy('id');
-
+    
         return collect($inventory)->map(function ($count, $key) use ($weapons, $characters) {
-            list($type, $id) = explode('_', $key);
-            $id = intval($id);
+            if (!preg_match('/^(weapon|character)_(\d+)$/', $key, $matches)) return null;
+            
+            $type = $matches[1];
+            $id = (int) $matches[2];
+    
             $item = $type === 'weapon' ? ($weapons[$id] ?? null) : ($characters[$id] ?? null);
             if ($item) {
                 $item->count = $count;
@@ -67,7 +72,7 @@ class InventoryService
             }
         })->filter()->values();
     }
-
+    
     private function getItemKey(Model $item): string
     {
         $type = $item instanceof Weapon ? 'weapon' : 'character';

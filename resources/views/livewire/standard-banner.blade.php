@@ -140,9 +140,9 @@
                         <span class="sr-only">Close modal</span>
                     </button>
                 </div>
-                <!-- Modal body -->
                 @if ($inventoryItems)
-                <div class="grid grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-3 ">
+
+                <div class="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     @foreach ($inventoryItems as $item)
                     <div
                         class="flex items-center p-1 bg-gray-500 border-2 border-yellow-300 border-solid rounded-lg shadow-slate-200">

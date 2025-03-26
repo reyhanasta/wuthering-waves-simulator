@@ -52,40 +52,53 @@ class WeaponResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                //
-                TextInput::make('name')
-                    ->translateLabel()
-                    ->autocapitalize('words')
-                    ->columnSpan(2)
-                    ->dehydrateStateUsing(fn($state) => ucwords($state))
-                    ->live(debounce: 1000)
-                    ->afterStateUpdated(function (Set $set, Get $get, ?string $state, ?string $old) {
-                        if (($get('slug') ?? '') !== Str::slug($old)) {
-                            return;
-                        }
-                        $set('slug', Str::slug($state));
-                    })->required(),
-                Hidden::make('slug'),
-                Select::make('rarity')
-                    ->options(Rarity::all()
-                        ->pluck('level', 'id')
-                        ->toArray())->live()->required(),
-                Select::make('type')
-                    ->options(WeaponType::all()
-                        ->pluck('name', 'id')
-                        ->map(fn($name) => ucwords($name))
-                        ->toArray())->live()->required(),
-                SpatieMediaLibraryFileUpload::make('img')
-                    ->disk('gacha')
-                    ->directory('weapons')
-                    ->label('Upload Images')
-                    ->preserveFilenames()
-                    ->responsiveImages()
-                    ->collection('gacha')
-                    ->conversion('thumb')
-                    ->columnSpan(3)->required(),
-            ])->columns(3);
+    ->schema([
+        SpatieMediaLibraryFileUpload::make('img')
+            ->disk('gacha')
+            ->directory('weapons')
+            ->label('Upload Images')
+            ->preserveFilenames()
+            ->responsiveImages()
+            ->collection('gacha')
+            ->conversion('thumb')
+            ->columnSpan(2)
+            ->required(),
+
+        TextInput::make('name')
+            ->translateLabel()
+            ->autocapitalize('words')
+            ->columnSpan(2)
+            ->dehydrateStateUsing(fn($state) => ucwords($state))
+            ->live(debounce: 1000)
+            ->afterStateUpdated(function (Set $set, Get $get, ?string $state, ?string $old) {
+                if (($get('slug') ?? '') !== Str::slug($old)) {
+                    return;
+                }
+                $set('slug', Str::slug($state));
+            })
+            ->disabled(fn(Get $get) => empty($get('img'))) // Disabled if no image
+            ->required(),
+
+        Hidden::make('slug'),
+
+        Select::make('rarity')
+            ->options(Rarity::all()
+                ->pluck('level', 'id')
+                ->toArray())
+            ->live()
+            ->disabled(fn(Get $get) => empty($get('img'))) // Disabled if no image
+            ->required(),
+
+        Select::make('type')
+            ->options(WeaponType::all()
+                ->pluck('name', 'id')
+                ->map(fn($name) => ucwords($name))
+                ->toArray())
+            ->live()
+            ->disabled(fn(Get $get) => empty($get('img'))) // Disabled if no image
+            ->required(),
+    ])->columns(2);
+
     }
 
     public static function table(Table $table): Table

@@ -49,6 +49,15 @@ class CharacterResource extends Resource
         return $form
             ->schema([
                 //
+                SpatieMediaLibraryFileUpload::make('icon')
+                    ->disk('gacha')
+                    ->directory('charaters')
+                    ->label('Upload Images')
+                    ->preserveFilenames()
+                    ->responsiveImages()
+                    ->collection('gacha')
+                    ->conversion('thumb')
+                    ->columnSpan(3)->required(),
                 TextInput::make('name')
                     ->translateLabel()
                     ->columnSpan(3)
@@ -60,20 +69,15 @@ class CharacterResource extends Resource
                         $set('slug', Str::slug($state));
                     })
                     ->dehydrateStateUsing(fn($state) => ucwords($state))
+                    ->disabled(fn(Get $get) => empty($get('icon'))) // Disabled if no image
                     ->required(),
                 Hidden::make('slug'),
-                Select::make('rarity')->relationship('characterRarity', 'level')->required(),
-                Select::make('weapon')->relationship('weaponType', 'name')->required(),
-                Select::make('attribute')->relationship('attributeType', 'name')->required(),
-                SpatieMediaLibraryFileUpload::make('icon')
-                    ->disk('gacha')
-                    ->directory('charaters')
-                    ->label('Upload Images')
-                    ->preserveFilenames()
-                    ->responsiveImages()
-                    ->collection('gacha')
-                    ->conversion('thumb')
-                    ->columnSpan(3)->required(),
+                Select::make('rarity')->relationship('characterRarity', 'level')->required() ->disabled(fn(Get $get) => empty($get('icon'))), // Disabled if no image,
+                Select::make('weapon')->relationship('weaponType', 'name')->required()
+                 ->disabled(fn(Get $get) => empty($get('icon'))), // Disabled if no image,
+                Select::make('attribute')->relationship('attributeType', 'name')->required()
+                 ->disabled(fn(Get $get) => empty($get('icon'))) // Disabled if no image,
+                
             ]);
     }
 
