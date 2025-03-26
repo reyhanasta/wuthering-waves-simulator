@@ -3,7 +3,7 @@
 
 <x-layouts.header></x-layouts.header>
 
-<body class="font-sans antialiased bg-gray-100 text-black/50 dark:bg-black dark:text-white">
+<body class="font-sans antialiased bg-black text-black/50 dark:bg-black dark:text-white">
     <!-- Background Image -->
     <img id="background" class="fixed top-0 left-0 w-full h-full bg-center bg-no-repeat bg-cover opacity-40 z-[-1]"
         src="{{ Storage::url('images/background/T_Bgloadin12_UI.png') }}" />
