@@ -109,14 +109,14 @@
                                             <form id="gachaForm" method="POST">
                                                 @csrf
                                                 <button type="submit"
-                                                    class="px-4 py-2 text-xl font-semibold text-black text-gray-900 bg-gray-100 rounded cursor-pointer dark:text-white hover:bg-blue-200 focus:text-blue-700 focus:bg-blue-200 focus:outline-none focus:ring-blue-600">
+                                                    class="px-4 py-2 text-xl font-semibold text-black bg-gray-100 rounded cursor-pointer dark:text-white hover:bg-blue-200 focus:text-blue-700 focus:bg-blue-200 focus:outline-none focus:ring-blue-600">
                                                     Single Pull
                                                 </button>
                                             </form>
                                             <form id="gacha-ten-pull" method="POST">
                                                 @csrf
                                                 <button type="submit"
-                                                    class="px-4 py-2 text-xl font-semibold text-black text-gray-900 bg-gray-100 rounded cursor-pointer dark:text-white hover:bg-blue-200 focus:text-blue-700 focus:bg-blue-200 focus:outline-none focus:ring-blue-600">
+                                                    class="px-4 py-2 text-xl font-semibold text-black bg-gray-100 rounded cursor-pointer dark:text-white hover:bg-blue-200 focus:text-blue-700 focus:bg-blue-200 focus:outline-none focus:ring-blue-600">
                                                     10x Pulls
                                                 </button>
                                             </form>

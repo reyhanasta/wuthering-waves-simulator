@@ -14,7 +14,6 @@ class WeaponSeeder extends Seeder
     public function run(): void
     {
         //3 Star Weapon
-
         $weapons = [
             [
                 'name' => 'Marcato',
@@ -33,14 +32,13 @@ class WeaponSeeder extends Seeder
                 'specifications' => 'standard'
             ],
             [
-                'name' => 'Verdant Summit',
-                'slug' => 'verdant-summit',
+                'name' => 'Iron of Genesis',
+                'slug' => 'iron-of-genesis',
                 'type' => 3,
                 'rarity' => 1,
                 'img' => '/',
-                'specifications' => 'limited'
-            ],
-            // tambahkan senjata lainnya
+                'specifications' => 'standard'
+            ]
         ];
 
 
@@ -54,11 +52,8 @@ class WeaponSeeder extends Seeder
                 'specifications'=> $weapon['specifications'],
                 ]
             );
-
                // Path ke file di public/storage/icons/gacha/
                $imagePath = asset('storage/icons/gacha/'.$weapon['img']);
-               
-
             if (file_exists($imagePath)) {
                 $newWeapon->addMedia($imagePath)
                           ->preservingOriginal()

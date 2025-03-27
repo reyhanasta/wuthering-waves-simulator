@@ -1,4 +1,4 @@
-<main class="container px-4 py-8 mx-auto lg:px-60">
+<main class="container px-4 mx-auto py-14 lg:px-60">
     <div class="w-full max-w-4xl">
         <div class="grid gap-6 lg:grid-cols-1 lg:gap-12">
             <div id="gachaContainer" class="flex flex-col items-center justify-center gap-3 lg:grid-cols-1">
@@ -31,12 +31,9 @@
                                     <p class="text-center text-white text-md">{{ $item['name'] }}</p>
                                 </div>
                             </div>
-
                             @endforeach
                         </div>
                         @else
-                        {{-- <img id="bannerImg" x-show="!isLoading" class="max-w-2xl m-4 shadow-lg rounded-2xl"
-                            src="{{ $bgImg }}" alt=""> --}}
                         <img id="bannerImg" x-show="!isLoading"
                             class="w-full h-auto max-w-2xl shadow-lg md:max-w-lg sm:max-w-xs rounded-2xl"
                             src="{{ $bgImg }}" alt="">
@@ -46,18 +43,20 @@
                         <!-- Pull Buttons -->
                         <div class="grid grid-cols-3 gap-4 lg:pb-4">
                             <button type="button" wire:click="singlePull" wire:loading.attr="disabled"
-                                wire:loading.class="opacity-50" wire:target='singlePull,tenPulls'
+                                wire:loading.class="opacity-50" wire:target='singlePull,tenPulls,resetAllRecords'
                                 class="px-6 py-2 text-black transition bg-white rounded-md hover:bg-blue-600 hover:text-white">
                                 Single Pull
                             </button>
 
                             <button type="button" wire:click="tenPulls" wire:loading.attr="disabled"
-                                wire:loading.class="opacity-50" wire:target='singlePull,tenPulls'
+                                wire:loading.class="opacity-50" wire:target='singlePull,tenPulls,resetAllRecords'
                                 class="py-3 text-black transition bg-white rounded-md hover:bg-blue-600 hover:text-white">
                                 10x Pulls
                             </button>
                             {{-- Button Reset --}}
-                            <button type="button" wire:click="resetAllRecords()" x-on:click="$wire.$refresh()"
+                            <button type="button" wire:click="resetAllRecords()" wire:loading.attr="disabled"
+                                wire:loading.class="opacity-50" x-on:click="$wire.$refresh()"
+                                wire:target='singlePull,tenPulls,resetAllRecords'
                                 class="py-3 text-black transition bg-white rounded-md hover:bg-red-600 hover:text-white">
                                 <span class="text-sm">Reset</span>
                             </button>
@@ -73,7 +72,7 @@
                                 </ul>
                             </div>
                             <!-- Navigation Buttons -->
-                            <div id="nav-bar" class="grid grid-cols-2 gap-1 mx-3 mt-3 border-gray-700">
+                            <div id="nav-bar" class="grid grid-cols-2 gap-1 mx-16 mt-3 border-gray-700">
                                 <div x-data="{ showInventory: false }">
                                     <!-- Button to open modal -->
                                     <button type="button" @click="showInventory = true"
@@ -86,8 +85,8 @@
                                     </button>
 
                                     <!-- Modal -->
-                                    <div x-show="showInventory" @keydown.escape.window="showInventory = false"
-                                        x-transition
+                                    <div x-show="showInventory" @keydown.escape.window="showInventory = false" x-cloak
+                                        x-show="open" x-transition
                                         class="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
                                         <div
                                             class="relative w-full max-w-2xl p-5 bg-gray-800 border-2 border-black shadow-lg sm:max-w-xs rounded-2xl">
@@ -104,7 +103,6 @@
                                                     <span class="sr-only">Close</span>
                                                 </button>
                                             </div>
-
                                             <!-- Modal Body -->
                                             @if ($inventoryItems)
                                             <div class="grid grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-3">
@@ -116,7 +114,7 @@
                                                         class="object-cover border border-gray-600 rounded-full w-14 h-14">
                                                     <div class="pl-2">
                                                         <p class="text-xs font-medium text-white">{{ $item->name }}</p>
-                                                        <p class="text-yellow-500">
+                                                        <p class="text-yellow-300">
                                                             @if ($item->rarity == 1) {{ str_repeat('★',5) }}
                                                             @elseif ($item->rarity == 2) {{ str_repeat('★',4) }}
                                                             @else {{ str_repeat('★',3) }}
@@ -152,7 +150,8 @@
                                         <span class="text-sm">Details</span>
                                     </button>
                                     <!-- Modal -->
-                                    <div x-show="showModal" @keydown.escape.window="showModal = false" x-transition
+                                    <div x-show="showModal" @keydown.escape.window="showModal = false" x-cloak
+                                        x-show="open" x-transition
                                         class="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
                                         <div
                                             class="relative w-full max-w-2xl p-5 bg-gray-800 border-2 border-yellow-300 shadow-lg sm:max-w-xs rounded-2xl">
@@ -179,8 +178,8 @@
                                                     <li>Rate for pulling a **4★ Resonator/Weapon**: <u>6.0%</u></li>
                                                 </ul>
                                                 <p>No Resonators or Weapons have increased rates on this Convene.</p>
-                                                <p>You can only use **Lustrous Tides** on this banner (basic summon
-                                                    ticket).</p>
+                                                {{-- <p>You can only use **Lustrous Tides** on this banner (basic summon
+                                                    ticket).</p> --}}
                                                 <p>You can obtain one of the following **5★ Resonators** from Novice
                                                     Convene:</p>
                                                 <p class="font-bold">Verina, Encore, Calcharo, Lingyang, & Jianxin.</p>
@@ -202,9 +201,5 @@
                 </div>
             </div>
         </div>
-
-
-
-
     </div>
 </main>
