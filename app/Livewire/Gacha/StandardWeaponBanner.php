@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Gacha;
 
-use Log;
 use App\Models\Rarity;
 use Livewire\Component;
 use App\Services\CacheService;
@@ -13,7 +12,7 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 
-class StandardBanner extends Component
+class StandardWeaponBanner extends Component
 {
     public $cacheDuration = 120; // Cache duration in minutes
     public $cachedData;
@@ -42,22 +41,31 @@ class StandardBanner extends Component
     public function mount(CacheService $cacheService, InventoryService $inventoryService)
     {
         $this->sessionId = Session::getId();
-        $this->baseDropRates = $this->getBaseDropRates($this->cacheDuration);
-
+        
         $this->bgImg = Storage::url('public/images/background/gacha-banner-2.jpg');
         $this->weaponImg = Storage::url('public/images/background/T_LuckdrawShare.png');
-        $this->cachedData = $cacheService->getCacheData($this->sessionId);
-
+        $this->cachedData = $cacheService->getCacheData($this->sessionId,'standard-weapon');
+        
         $this->inventory = $inventoryService->getInventory($this->sessionId);
         $this->inventoryItems = $inventoryService->refreshInventory($this->sessionId);
-
+        
+        $this->baseDropRates = $this->getBaseDropRates($this->cacheDuration);
         $this->get5starId = $this->baseDropRates->firstWhere('level', 'SSR')->id;
-        $this->get4starId = $this->baseDropRates->firstWhere('level', 'SR')->id;
+        $this->get4starId = $this->getBannerIdByLevelAndName('SR', 'standard-weapon-banner');
     }
 
+
+    private function getBannerIdByLevelAndName($level, $name)
+{
+    return $this->baseDropRates
+        ->first(fn ($item) => $item->level === $level && $item->name === $name)
+        ?->id;
+}
+
+    // Removed duplicate method declaration
     public function getBaseDropRates($cacheDuration)
     {
-        return Cache::remember('baseDropRates', $cacheDuration * 60, function () {
+        return Cache::remember('baseDropRates', $cacheDuration * 60, callback: function () {
             return Rarity::select('id', 'level')->get();
         });
     }
@@ -185,9 +193,8 @@ class StandardBanner extends Component
             default => 3,
         };
     }
-
     public function render()
     {
-        return view('livewire.standard-banner');
+        return view('livewire.standard-weapon-banner');
     }
 }
